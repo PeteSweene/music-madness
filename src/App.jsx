@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { Trophy, Crown, Lock, Check, X } from "lucide-react";
 import { supabase } from "./supabase.js";
 
 // ── Voter token ───────────────────────────────────────────────────────────────
@@ -340,7 +341,7 @@ function BNode({song,x,y,isWinner,isLoser,isLive,isPast,isFuture,unlockDay,isSel
           {isLive&&<div className="live-dot" style={{position:"absolute",top:5,right:7,width:5,height:5,borderRadius:"50%",background:C.yellow}}/>}
         </>:<div style={{fontSize:10,color:C.gray300,fontFamily:"'Barlow Condensed',sans-serif"}}>TBD</div>}
       </div>
-      {isFuture&&hov&&unlockDay&&<div style={{position:"absolute",top:CARD_H+5,left:"50%",transform:"translateX(-50%)",background:C.black,border:`1px solid ${C.gray700}`,borderRadius:4,padding:"5px 10px",whiteSpace:"nowrap",zIndex:999,fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,textTransform:"uppercase",letterSpacing:1.5,color:C.gray300,pointerEvents:"none"}}>🔒 Unlocks Day {unlockDay}</div>}
+      {isFuture&&hov&&unlockDay&&<div style={{position:"absolute",top:CARD_H+5,left:"50%",transform:"translateX(-50%)",background:C.black,border:`1px solid ${C.gray700}`,borderRadius:4,padding:"5px 10px",whiteSpace:"nowrap",zIndex:999,fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,textTransform:"uppercase",letterSpacing:1.5,color:C.gray300,pointerEvents:"none",display:"flex",alignItems:"center",gap:5}}><Lock size={10} color={C.gray300}/>Unlocks Day {unlockDay}</div>}
       {isPast&&hov&&<div style={{position:"absolute",top:CARD_H+5,left:"50%",transform:"translateX(-50%)",background:C.black,border:`1px solid ${C.gray700}`,borderRadius:4,padding:"5px 10px",whiteSpace:"nowrap",zIndex:999,fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,textTransform:"uppercase",letterSpacing:1.5,color:C.gray300,pointerEvents:"none"}}>View Results</div>}
     </div>
   );
@@ -480,7 +481,7 @@ function ArchiveBracket({archive}){
   }
 
   if(archive.final){
-    cards.push(<div key="final-label" style={{position:"absolute",left:A_FINAL_X,top:finalCardY-28,width:A_CARD_W,textAlign:"center",fontFamily:"'Barlow Condensed',sans-serif",fontSize:9,textTransform:"uppercase",letterSpacing:2,color:acc.accent}}>🏆 Champion</div>);
+    cards.push(<div key="final-label" style={{position:"absolute",left:A_FINAL_X,top:finalCardY-28,width:A_CARD_W,textAlign:"center",fontFamily:"'Barlow Condensed',sans-serif",fontSize:9,textTransform:"uppercase",letterSpacing:2,color:acc.accent,display:"flex",alignItems:"center",justifyContent:"center",gap:4}}><Trophy size={10} color={acc.accent}/>Champion</div>);
     cards.push(<ArchiveCard key="final" title={archive.champion} subtitle={archive.championArtist} isWinner={true} isChampion={true} accent={acc.accent} accentBg={acc.accentBg} isSelected={selected?.key==="final"} style={{position:"absolute",left:A_FINAL_X,top:finalCardY,width:A_CARD_W,height:A_CARD_H}} onClick={()=>setSelected(selected?.key==="final"?null:{key:"final",w:archive.final.w,l:archive.final.l})}/>);
   }
 
@@ -561,7 +562,7 @@ function ArchiveCard({title,subtitle,isWinner,isChampion,isSelected,style,onClic
         overflow:"hidden",boxSizing:"border-box",
         boxShadow:isChampion?`0 2px 12px ${accent}33`:"none"}}>
       <div style={{fontSize:11,fontWeight:700,color:isWinner?C.black:C.gray400,fontFamily:"'Barlow Condensed',sans-serif",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",lineHeight:1.2}}>
-        {isWinner&&<span style={{color:accent,marginRight:4}}>👑</span>}{title}
+        {isWinner&&<Crown size={11} color={accent} style={{marginRight:4,flexShrink:0,display:"inline-block",verticalAlign:"middle"}}/>}{title}
       </div>
       {subtitle&&<div style={{fontSize:9,color:C.gray500,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",marginTop:2}}>{subtitle}</div>}
     </div>
@@ -626,13 +627,13 @@ function VoteCard({m,voted,pending,setPending,confirmVote,highlight}){
                 {showResults&&<div style={{position:"absolute",left:0,top:0,bottom:0,width:`${vPct}%`,background:isWin?"rgba(230,205,9,0.12)":"rgba(0,0,0,0.03)",transition:"width 0.5s ease",pointerEvents:"none"}}/>}
                 <div style={{width:26,height:26,borderRadius:6,flexShrink:0,background:chosen?C.yellow:isWin?C.black:C.gray100,display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:800,color:chosen?C.black:isWin?C.yellow:C.gray600,zIndex:1}}>{song?.seed}</div>
                 <div style={{flex:1,minWidth:0,zIndex:1}}>
-                  <div style={{fontSize:15,fontWeight:700,color:isWin?C.black:isLose?C.gray400:C.black,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",lineHeight:1.2,textDecoration:isLose?"line-through":"none"}}>
-                    {isWin&&"👑 "}{song?.title}
-                  </div>
+                  <div style={{fontSize:15,fontWeight:700,color:isWin?C.black:isLose?C.gray400:C.black,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",lineHeight:1.2,textDecoration:isLose?"line-through":"none",display:"flex",alignItems:"center",gap:4}}>
+                      {isWin&&<Crown size={13} color={C.black} style={{flexShrink:0}}/>}{song?.title}
+                    </div>
                   <div style={{fontSize:12,color:C.gray500,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{song?.artist} · {song?.year}</div>
                 </div>
                 {showResults&&<div style={{textAlign:"right",flexShrink:0,zIndex:1}}><div style={{fontSize:15,fontWeight:800,color:isWin?C.black:C.gray400}}>{vPct}%</div><div style={{fontSize:10,color:C.gray400}}>{votes} vote{votes!==1?"s":""}</div></div>}
-                {canVote&&chosen&&!uv&&<div style={{width:18,height:18,borderRadius:"50%",background:C.yellow,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,zIndex:1}}><span style={{fontSize:10,color:C.black,fontWeight:900}}>✓</span></div>}
+                {canVote&&chosen&&!uv&&<div style={{width:18,height:18,borderRadius:"50%",background:C.yellow,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,zIndex:1}}><Check size={11} color={C.black} strokeWidth={3}/></div>}
               </div>
             </div>
           );
@@ -647,7 +648,7 @@ function VoteCard({m,voted,pending,setPending,confirmVote,highlight}){
         )}
         {uv&&(
           <div style={{marginTop:10,display:"flex",alignItems:"center",justifyContent:"space-between",gap:10}}>
-            <div style={{fontSize:12,color:C.green,fontWeight:600}}>✓ Your vote is in</div>
+            <div style={{fontSize:12,color:C.green,fontWeight:600,display:"flex",alignItems:"center",gap:5}}><Check size={13} color={C.green} strokeWidth={3}/>Your vote is in</div>
             <button onClick={handleShare}
               style={{display:"flex",alignItems:"center",gap:6,padding:"6px 14px",background:C.black,border:"none",borderRadius:8,color:C.white,fontSize:12,fontWeight:700,fontFamily:"'Barlow Condensed',sans-serif",textTransform:"uppercase",letterSpacing:1,cursor:"pointer",transition:"background 0.15s",flexShrink:0}}
               onMouseEnter={e=>e.currentTarget.style.background=C.gray800}
@@ -880,7 +881,7 @@ export default function App(){
                 <div>
                   <div style={{fontSize:11,textTransform:"uppercase",letterSpacing:2,color:C.gray500,fontFamily:"'Barlow Condensed',sans-serif",marginBottom:4}}>{a.year}</div>
                   <div style={{fontSize:22,fontWeight:900,fontFamily:"'Bebas Neue',sans-serif",letterSpacing:1,color:C.black,lineHeight:1,marginBottom:8}}>{a.theme}</div>
-                  <div style={{fontSize:13,color:C.gray600}}>🏆 <strong>{a.champion}</strong> — {a.championArtist}</div>
+                  <div style={{fontSize:13,color:C.gray600,display:"flex",alignItems:"center",gap:6}}><Trophy size={13} color={C.gray600}/><strong>{a.champion}</strong> — {a.championArtist}</div>
                 </div>
                 <div style={{fontSize:20,color:C.gray300,flexShrink:0}}>→</div>
               </div>
@@ -994,7 +995,7 @@ export default function App(){
                   {mkSCard(northSemi, SEMI_L_X, sLBotCY)}
                   {mkSCard(westSemi,  SEMI_R_X, sRTopCY)}
                   {mkSCard(southSemi, SEMI_R_X, sRBotCY)}
-                  <div key="final-label" style={{position:"absolute",left:FINAL_X,top:Math.min(finalTopCY,finalBotCY)-CARD_H/2-22,width:CARD_W,textAlign:"center",fontFamily:"'Barlow Condensed',sans-serif",fontSize:9,textTransform:"uppercase",letterSpacing:2,color:C.yellow}}>🏆 Final</div>
+                  <div key="final-label" style={{position:"absolute",left:FINAL_X,top:Math.min(finalTopCY,finalBotCY)-CARD_H/2-22,width:CARD_W,textAlign:"center",fontFamily:"'Barlow Condensed',sans-serif",fontSize:9,textTransform:"uppercase",letterSpacing:2,color:C.yellow,display:"flex",alignItems:"center",justifyContent:"center",gap:4}}><Trophy size={10} color={C.yellow}/>Final</div>
                   {mkFCard(finalTopCY)}
                   {mkFCard(finalBotCY)}
                 </>);
@@ -1015,7 +1016,7 @@ export default function App(){
           <div style={{borderTop:`2px solid ${C.yellow}`,background:C.white,padding:"16px 20px",flexShrink:0,maxHeight:"45vh",overflowY:"auto"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
               <div style={{fontSize:11,textTransform:"uppercase",letterSpacing:2,fontFamily:"'Barlow Condensed',sans-serif",color:C.gray500}}>{selectedMatchup.region} · Day {selectedMatchup.day}</div>
-              <button onClick={()=>setSelectedMatchup(null)} style={{fontSize:18,color:C.gray400,padding:"0 4px"}}>✕</button>
+              <button onClick={()=>setSelectedMatchup(null)} style={{color:C.gray400,padding:"0 4px",display:"flex",alignItems:"center"}}><X size={18}/></button>
             </div>
             <VoteCard m={selectedMatchup} voted={voted} pending={pending} setPending={setPending} confirmVote={confirmVote}/>
           </div>
