@@ -56,75 +56,16 @@ const GLOBAL_CSS = `
 `;
 
 // ── Archive themes (dark per-year) ────────────────────────────────────────────
-const THEMES = {
-  "1960s": {
-    bg:"#1a1400", surface:"#241c00", border:"#4a3a00", text:"#fff5c0",
-    dim:"#8a7a30", accent:"#f0c010", accent2:"#00b8a0",
-    fontHeading:"'Righteous', 'Barlow Condensed', sans-serif",
-    fontBody:"'Barlow Condensed', sans-serif",
-    bracketBg:"radial-gradient(ellipse at 30% 40%, #1a2800 0%, #0a0e00 60%, #200a00 100%)",
-    extraCss:`
-      @keyframes groovySpin { 0%{transform:rotate(-2deg);}50%{transform:rotate(2deg);}100%{transform:rotate(-2deg);} }
-      @keyframes psychePulse { 0%,100%{box-shadow:0 0 0 0 rgba(240,192,16,0);}33%{box-shadow:0 0 16px 4px rgba(240,192,16,0.3);}66%{box-shadow:0 0 16px 4px rgba(0,184,160,0.2);} }
-      .champion-groove { animation: groovySpin 3s ease-in-out infinite; }
-      .live-accent { animation: psychePulse 2s ease infinite; }
-    `,
-  },
-  breakup: {
-    bg:"#0a0008", surface:"#160010", border:"#3a0025", text:"#f0c0d8",
-    dim:"#704060", accent:"#c02050", accent2:"#8030a0",
-    fontHeading:"'Cormorant Garamond', serif",
-    fontBody:"'Barlow Condensed', sans-serif",
-    bracketBg:"radial-gradient(ellipse at 50% 30%, #180010 0%, #080008 70%)",
-    extraCss:`
-      @keyframes heartbeat { 0%,100%{transform:scale(1);}14%{transform:scale(1.04);}28%{transform:scale(1);} }
-      @keyframes crackedPulse { 0%,100%{box-shadow:0 0 0 0 rgba(192,32,80,0);}50%{box-shadow:0 0 14px 3px rgba(192,32,80,0.3);} }
-      .live-accent { animation: crackedPulse 2.4s ease infinite; }
-      .champion-beat { animation: heartbeat 1.4s ease-in-out infinite; }
-    `,
-  },
-  love: {
-    bg:"#100810", surface:"#1c0e1c", border:"#3c1a3c", text:"#ffd8f0",
-    dim:"#906080", accent:"#e060a0", accent2:"#c090e0",
-    fontHeading:"'Dancing Script', cursive",
-    fontBody:"'Barlow Condensed', sans-serif",
-    bracketBg:"radial-gradient(ellipse at 50% 50%, #180c18 0%, #0c0610 70%)",
-    extraCss:`
-      @keyframes heartFloat { 0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-3px) scale(1.03);} }
-      @keyframes rosePulse { 0%,100%{box-shadow:0 0 0 0 rgba(224,96,160,0);}50%{box-shadow:0 0 16px 4px rgba(224,96,160,0.28);} }
-      .live-accent { animation: rosePulse 2s ease infinite; }
-      .champion-float { animation: heartFloat 3s ease-in-out infinite; }
-    `,
-  },
-  summer: {
-    bg:"#010d18", surface:"#051828", border:"#0a3048", text:"#e0f8ff",
-    dim:"#307080", accent:"#00c8e0", accent2:"#f0c000",
-    fontHeading:"'Pacifico', cursive",
-    fontBody:"'Barlow Condensed', sans-serif",
-    bracketBg:"radial-gradient(ellipse at 50% 70%, #001828 0%, #010810 70%)",
-    extraCss:`
-      @keyframes bobFloat { 0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);} }
-      @keyframes waveShimmer { 0%,100%{box-shadow:0 0 0 0 rgba(0,200,224,0);}50%{box-shadow:0 0 18px 4px rgba(0,200,224,0.25);} }
-      .live-accent { animation: waveShimmer 2s ease infinite; }
-      .champion-bob { animation: bobFloat 2.5s ease-in-out infinite; }
-    `,
-  },
-  party: {
-    bg:"#020208", surface:"#080818", border:"#200840", text:"#f0e0ff",
-    dim:"#605080", accent:"#e000c0", accent2:"#00e8ff",
-    fontHeading:"'Boogaloo', sans-serif",
-    fontBody:"'Barlow Condensed', sans-serif",
-    bracketBg:"radial-gradient(ellipse at 50% 50%, #0c0420 0%, #020208 70%)",
-    extraCss:`
-      @keyframes jumpPulse { 0%,100%{transform:scale(1);}50%{transform:scale(1.04);} }
-      @keyframes neonFlash { 0%,100%{box-shadow:0 0 8px 2px rgba(224,0,192,0.4);}50%{box-shadow:0 0 20px 6px rgba(0,232,255,0.4);} }
-      .live-accent { animation: neonFlash 1.2s ease infinite; }
-      .champion-jump { animation: jumpPulse 0.8s ease-in-out infinite; }
-    `,
-  },
+// Archive accent colors — each year gets a unique color on the shared light system
+const ARCHIVE_ACCENTS = {
+  "2025": { accent:"#D97706", accentDk:"#92400E", accentBg:"#FFFBEB" }, // amber
+  "2024": { accent:"#DC2626", accentDk:"#7F1D1D", accentBg:"#FEF2F2" }, // red
+  "2023": { accent:"#DB2777", accentDk:"#831843", accentBg:"#FDF2F8" }, // rose
+  "2022": { accent:"#0891B2", accentDk:"#164E63", accentBg:"#ECFEFF" }, // cyan
+  "2021": { accent:"#7C3AED", accentDk:"#4C1D95", accentBg:"#F5F3FF" }, // violet
 };
-const YEAR_THEME = { "2025":"1960s", "2024":"breakup", "2023":"love", "2022":"summer", "2021":"party" };
-const buildArchiveCss = (t) => `${t.extraCss||""}\n${GLOBAL_CSS}\n::-webkit-scrollbar-track{background:${t.bg};}\n::-webkit-scrollbar-thumb{background:${t.border};border-radius:2px;}`;
+const YEAR_THEME = { "2025":"2025", "2024":"2024", "2023":"2023", "2022":"2022", "2021":"2021" };
+const buildArchiveCss = () => GLOBAL_CSS;
 
 // ── Song data ─────────────────────────────────────────────────────────────────
 const S = (id,seed,title,artist,year) => ({id,seed,title,artist,year});
@@ -351,15 +292,19 @@ const ARCHIVES = [
 // ── Bracket geometry ──────────────────────────────────────────────────────────
 const ROUNDS=4, TOTAL_H=32*BASE_SLOT_H;
 const REGION_W = ROUNDS*(CARD_W+ROUND_GAP_X)-ROUND_GAP_X;
-const FINAL_GAP=90, CANVAS_W=REGION_W*2+FINAL_GAP+CARD_W+40;
-const CANVAS_H=TOTAL_H+100;
-const RIGHT_BASE_X=REGION_W+FINAL_GAP+CARD_W+40;
-const FINAL_X=REGION_W+FINAL_GAP/2+20;
-const FINAL_Y=TOTAL_H/2-CARD_H-12;
-const leftX = r => r*(CARD_W+ROUND_GAP_X);
+const SEMI_GAP=60, FINAL_GAP=60;
+// Left semis column: after region, right semis column: mirrored
+const SEMI_L_X = REGION_W + SEMI_GAP;
+const FINAL_X  = SEMI_L_X + CARD_W + FINAL_GAP;
+const SEMI_R_X = FINAL_X  + CARD_W + FINAL_GAP;
+const RIGHT_BASE_X = SEMI_R_X + CARD_W + SEMI_GAP;
+const CANVAS_W = RIGHT_BASE_X + REGION_W;
+const CANVAS_H = TOTAL_H + 100;
+const leftX  = r => r*(CARD_W+ROUND_GAP_X);
 const rightX = r => RIGHT_BASE_X+(ROUNDS-1-r)*(CARD_W+ROUND_GAP_X);
-const slotH = r => BASE_SLOT_H*Math.pow(2,r);
+const slotH  = r => BASE_SLOT_H*Math.pow(2,r);
 const cardCY = (r,k) => 60+k*slotH(r)+slotH(r)/2;
+const FINAL_Y  = TOTAL_H/2 - CARD_H - 12;
 
 // ── Archive geometry ──────────────────────────────────────────────────────────
 const A_CARD_W=160,A_CARD_H=48,A_COL_GAP=36,A_SLOT_H=72;
@@ -401,9 +346,9 @@ function BNode({song,x,y,isWinner,isLoser,isLive,isPast,isFuture,unlockDay,isSel
   );
 }
 
-// ── Archive bracket ───────────────────────────────────────────────────────────
-function ArchiveBracket({archive,theme}){
-  const t=theme;
+// ── Archive bracket (light theme, per-year accent) ──────────────────────────
+function ArchiveBracket({archive}){
+  const acc = ARCHIVE_ACCENTS[archive.year] || ARCHIVE_ACCENTS["2025"];
   const vpRef=useRef(null);
   const panRef=useRef({on:false,sx:0,sy:0,sl:0,st:0});
   const pinchRef=useRef({active:false,dist:0});
@@ -450,35 +395,49 @@ function ArchiveBracket({archive,theme}){
   const resetZ=()=>{setZoom(0.65);setTimeout(()=>center(0.65),0);};
 
   const cards=[],lines=[];
-  const pushCard=(key,title,isWinner,x,y,topBandY,matchKey,w,l)=>{
-    const absY=topBandY+y-A_CARD_H/2;
-    cards.push(<ArchiveCard key={key} title={title} isWinner={isWinner} theme={t} isSelected={selected?.key===matchKey} style={{position:"absolute",left:x,top:absY,width:A_CARD_W,height:A_CARD_H}} onClick={()=>setSelected(selected?.key===matchKey?null:{key:matchKey,w,l})}/>);
+
+  const pushCard=(key,title,isWinner,x,absY,matchKey,w,l)=>{
+    cards.push(
+      <ArchiveCard key={key} title={title} isWinner={isWinner} accent={acc.accent} accentBg={acc.accentBg}
+        isSelected={selected?.key===matchKey}
+        style={{position:"absolute",left:x,top:absY,width:A_CARD_W,height:A_CARD_H}}
+        onClick={()=>setSelected(selected?.key===matchKey?null:{key:matchKey,w,l})}
+      />
+    );
   };
-  const pushLine=(key,x1,y1,x2,y2)=>{lines.push(<line key={key} x1={x1} y1={y1} x2={x2} y2={y2} stroke={t.border} strokeWidth={1.5}/>);};
-  const pushCurve=(key,x1,y1,x2,y2)=>{const mx=(x1+x2)/2;lines.push(<path key={key} d={`M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`} fill="none" stroke={t.border} strokeWidth={1.5}/>);};
+
+  // Right-angle elbow: H segment from exit point → midX column → V segment → H to entry point
+  const pushElbow=(key,x1,y1,x2,y2)=>{
+    const midX=(x1+x2)/2;
+    lines.push(<path key={key} d={`M${x1},${y1} L${midX},${y1} L${midX},${y2} L${x2},${y2}`} fill="none" stroke={C.gray200} strokeWidth={1.5}/>);
+  };
+  const pushVBar=(key,x,y1,y2)=>{
+    lines.push(<line key={key} x1={x} y1={y1} x2={x} y2={y2} stroke={C.gray200} strokeWidth={1.5}/>);
+  };
 
   const renderRegion=(region,ri,topBandY,isRight)=>{
     const rounds=[region.r64,region.r32,region.s16,region.e8];
     rounds.forEach((matches,r)=>{
       matches.forEach((match,k)=>{
-        const slotBase=k*2;
-        [[match.w,true],[match.l,false]].forEach(([name,win],ei)=>{
-          const slot=slotBase+ei;
-          const cy=aCardY(r,slot);
-          const x=isRight?aRightColX(r):aColX(r);
-          pushCard(`${ri}-${r}-${k}-${ei}`,name,win,x,cy,topBandY,`${ri}-${r}-${k}`,match.w,match.l);
-        });
-        if(r<4){
-          const y1=topBandY+aCardY(r,k*2),y2=topBandY+aCardY(r,k*2+1);
-          const midY=(y1+y2)/2;
-          const barX=isRight?aRightColX(r):aColX(r)+A_CARD_W;
-          pushLine(`vbar-${ri}-${r}-${k}`,barX,y1,barX,y2);
-          if(r<3){
-            const nextY=topBandY+aCardY(r+1,k);
-            const nextX=isRight?aRightColX(r+1)+A_CARD_W:aColX(r+1);
-            pushLine(`hmid-${ri}-${r}-${k}`,barX,midY,(barX+nextX)/2,midY);
-            pushCurve(`conn-${ri}-${r}-${k}`,(barX+nextX)/2,midY,nextX,nextY);
-          }
+        const cy0=topBandY+aCardY(r,k*2);
+        const cy1=topBandY+aCardY(r,k*2+1);
+        const x=isRight?aRightColX(r):aColX(r);
+
+        pushCard(`${ri}-${r}-${k}-0`,match.w,true,  x,cy0-A_CARD_H/2,`${ri}-${r}-${k}`,match.w,match.l);
+        pushCard(`${ri}-${r}-${k}-1`,match.l,false, x,cy1-A_CARD_H/2,`${ri}-${r}-${k}`,match.w,match.l);
+
+        // Always draw vertical bar connecting the two cards in this matchup
+        const barX=isRight?x:x+A_CARD_W;
+        pushVBar(`vbar-${ri}-${r}-${k}`,barX,cy0,cy1);
+
+        if(r<3){
+          const midY=(cy0+cy1)/2;
+          const nextK=Math.floor(k/2);
+          const isTopFeeder=(k%2===0);
+          const targetSlot=isTopFeeder?nextK*2:nextK*2+1;
+          const nextCY=topBandY+aCardY(r+1,targetSlot);
+          const nextX=isRight?aRightColX(r+1)+A_CARD_W:aColX(r+1);
+          pushElbow(`elbow-${ri}-${r}-${k}`,barX,midY,nextX,nextCY);
         }
       });
     });
@@ -492,69 +451,88 @@ function ArchiveBracket({archive,theme}){
 
   const leftTopE8Y=TOP_Y+aCardY(3,0),leftBotE8Y=BOT_Y+aCardY(3,0);
   const rightTopE8Y=TOP_Y+aCardY(3,0),rightBotE8Y=BOT_Y+aCardY(3,0);
-  const finalCY=(leftTopE8Y+leftBotE8Y)/2,finalCardY=finalCY-A_CARD_H/2;
+  const finalCY=(leftTopE8Y+leftBotE8Y)/2;
+  const finalCardY=finalCY-A_CARD_H/2;
 
   if(archive.semis){
     const ls=archive.semis[0],rs=archive.semis[1];
-    const lsGap=A_CARD_H*1.4,rsGap=A_CARD_H*1.4;
-    const leftSemiCY=(leftTopE8Y+leftBotE8Y)/2,rightSemiCY=(rightTopE8Y+rightBotE8Y)/2;
-    [[ls.w,true,leftSemiCY-lsGap/2],[ls.l,false,leftSemiCY+lsGap/2]].forEach(([name,win,cy],ei)=>{
-      cards.push(<ArchiveCard key={`ls-${ei}`} title={name} isWinner={win} theme={t} isSelected={selected?.key==="ls"} style={{position:"absolute",left:A_LEFT_SEMI_X,top:cy-A_CARD_H/2,width:A_CARD_W,height:A_CARD_H}} onClick={()=>setSelected(selected?.key==="ls"?null:{key:"ls",w:ls.w,l:ls.l})}/>);
+    const gap=A_CARD_H*1.4;
+    const leftSemiCY=(leftTopE8Y+leftBotE8Y)/2;
+    const rightSemiCY=(rightTopE8Y+rightBotE8Y)/2;
+
+    [[ls.w,true,leftSemiCY-gap/2],[ls.l,false,leftSemiCY+gap/2]].forEach(([name,win,cy],ei)=>{
+      cards.push(<ArchiveCard key={`ls-${ei}`} title={name} isWinner={win} accent={acc.accent} accentBg={acc.accentBg} isSelected={selected?.key==="ls"} style={{position:"absolute",left:A_LEFT_SEMI_X,top:cy-A_CARD_H/2,width:A_CARD_W,height:A_CARD_H}} onClick={()=>setSelected(selected?.key==="ls"?null:{key:"ls",w:ls.w,l:ls.l})}/>);
     });
     const leftE8EdgeX=aColX(3)+A_CARD_W;
-    pushLine("le8-top",leftE8EdgeX,leftTopE8Y,A_LEFT_SEMI_X,leftSemiCY-lsGap/2);
-    pushLine("le8-bot",leftE8EdgeX,leftBotE8Y,A_LEFT_SEMI_X,leftSemiCY+lsGap/2);
-    pushLine("ls-vbar",A_LEFT_SEMI_X+A_CARD_W,leftSemiCY-lsGap/2,A_LEFT_SEMI_X+A_CARD_W,leftSemiCY+lsGap/2);
-    pushLine("ls-hbar",A_LEFT_SEMI_X+A_CARD_W,leftSemiCY,(A_LEFT_SEMI_X+A_CARD_W+A_FINAL_X)/2,leftSemiCY);
-    pushCurve("lsf",(A_LEFT_SEMI_X+A_CARD_W+A_FINAL_X)/2,leftSemiCY,A_FINAL_X,finalCY);
-    [[rs.w,true,rightSemiCY-rsGap/2],[rs.l,false,rightSemiCY+rsGap/2]].forEach(([name,win,cy],ei)=>{
-      cards.push(<ArchiveCard key={`rs-${ei}`} title={name} isWinner={win} theme={t} isSelected={selected?.key==="rs"} style={{position:"absolute",left:A_RIGHT_SEMI_X,top:cy-A_CARD_H/2,width:A_CARD_W,height:A_CARD_H}} onClick={()=>setSelected(selected?.key==="rs"?null:{key:"rs",w:rs.w,l:rs.l})}/>);
+    pushElbow("le8-top",leftE8EdgeX,leftTopE8Y,A_LEFT_SEMI_X,leftSemiCY-gap/2);
+    pushElbow("le8-bot",leftE8EdgeX,leftBotE8Y,A_LEFT_SEMI_X,leftSemiCY+gap/2);
+    pushVBar("ls-vbar",A_LEFT_SEMI_X+A_CARD_W,leftSemiCY-gap/2,leftSemiCY+gap/2);
+    pushElbow("ls-final",A_LEFT_SEMI_X+A_CARD_W,leftSemiCY,A_FINAL_X,finalCY);
+
+    [[rs.w,true,rightSemiCY-gap/2],[rs.l,false,rightSemiCY+gap/2]].forEach(([name,win,cy],ei)=>{
+      cards.push(<ArchiveCard key={`rs-${ei}`} title={name} isWinner={win} accent={acc.accent} accentBg={acc.accentBg} isSelected={selected?.key==="rs"} style={{position:"absolute",left:A_RIGHT_SEMI_X,top:cy-A_CARD_H/2,width:A_CARD_W,height:A_CARD_H}} onClick={()=>setSelected(selected?.key==="rs"?null:{key:"rs",w:rs.w,l:rs.l})}/>);
     });
     const rightE8EdgeX=aRightColX(3);
-    pushLine("re8-top",rightE8EdgeX,rightTopE8Y,A_RIGHT_SEMI_X+A_CARD_W,rightSemiCY-rsGap/2);
-    pushLine("re8-bot",rightE8EdgeX,rightBotE8Y,A_RIGHT_SEMI_X+A_CARD_W,rightSemiCY+rsGap/2);
-    pushLine("rs-vbar",A_RIGHT_SEMI_X,rightSemiCY-rsGap/2,A_RIGHT_SEMI_X,rightSemiCY+rsGap/2);
-    pushLine("rs-hbar",A_RIGHT_SEMI_X,rightSemiCY,(A_RIGHT_SEMI_X+A_FINAL_X+A_FINAL_W)/2,rightSemiCY);
-    pushCurve("rsf",(A_RIGHT_SEMI_X+A_FINAL_X+A_FINAL_W)/2,rightSemiCY,A_FINAL_X+A_FINAL_W,finalCY);
+    pushElbow("re8-top",rightE8EdgeX,rightTopE8Y,A_RIGHT_SEMI_X+A_CARD_W,rightSemiCY-gap/2);
+    pushElbow("re8-bot",rightE8EdgeX,rightBotE8Y,A_RIGHT_SEMI_X+A_CARD_W,rightSemiCY+gap/2);
+    pushVBar("rs-vbar",A_RIGHT_SEMI_X,rightSemiCY-gap/2,rightSemiCY+gap/2);
+    pushElbow("rs-final",A_RIGHT_SEMI_X,rightSemiCY,A_FINAL_X+A_FINAL_W,finalCY);
   }
 
   if(archive.final){
-    const champClass={"1960s":"champion-groove",breakup:"champion-beat",love:"champion-float",summer:"champion-bob",party:"champion-jump"}[YEAR_THEME[archive.year]]||"";
-    cards.push(<div key="final-label" style={{position:"absolute",left:A_FINAL_X,top:finalCardY-28,width:A_CARD_W,textAlign:"center",fontFamily:t.fontBody,fontSize:9,textTransform:"uppercase",letterSpacing:2,color:t.accent}}>🏆 Champion</div>);
-    cards.push(<ArchiveCard key="final" title={archive.champion} subtitle={archive.championArtist} isWinner={true} isChampion={true} theme={t} extraClass={champClass} isSelected={selected?.key==="final"} style={{position:"absolute",left:A_FINAL_X,top:finalCardY,width:A_CARD_W,height:A_CARD_H}} onClick={()=>setSelected(selected?.key==="final"?null:{key:"final",w:archive.final.w,l:archive.final.l})}/>);
+    cards.push(<div key="final-label" style={{position:"absolute",left:A_FINAL_X,top:finalCardY-28,width:A_CARD_W,textAlign:"center",fontFamily:"'Barlow Condensed',sans-serif",fontSize:9,textTransform:"uppercase",letterSpacing:2,color:acc.accent}}>🏆 Champion</div>);
+    cards.push(<ArchiveCard key="final" title={archive.champion} subtitle={archive.championArtist} isWinner={true} isChampion={true} accent={acc.accent} accentBg={acc.accentBg} isSelected={selected?.key==="final"} style={{position:"absolute",left:A_FINAL_X,top:finalCardY,width:A_CARD_W,height:A_CARD_H}} onClick={()=>setSelected(selected?.key==="final"?null:{key:"final",w:archive.final.w,l:archive.final.l})}/>);
   }
 
-  const ResultPanel=()=>{
-    if(!selected) return <div style={{maxWidth:780,margin:"0 auto",padding:"20px 20px 40px",textAlign:"center"}}><div style={{color:t.border,fontFamily:t.fontBody,fontSize:11,textTransform:"uppercase",letterSpacing:2}}>Click any matchup to see the result</div></div>;
-    return (
-      <div style={{maxWidth:780,margin:"0 auto",padding:"20px 20px 40px"}} className="slide-up">
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}}>
-          <div style={{fontFamily:t.fontHeading,fontSize:22,color:t.text}}>Match Result</div>
-          <button onClick={()=>setSelected(null)} style={{background:"none",border:`1px solid ${t.border}`,color:t.dim,borderRadius:8,padding:"4px 12px",fontSize:12,fontFamily:t.fontBody,textTransform:"uppercase",letterSpacing:1}}>✕</button>
+  const [panelOpen, setPanelOpen] = useState(false);
+  // Auto-open when a matchup is selected
+  useEffect(()=>{ if(selected) setPanelOpen(true); },[selected]);
+
+  const ResultPanel=()=>(
+    <div style={{borderTop:`1px solid ${C.gray100}`,background:C.white}}>
+      {/* Toggle bar */}
+      <div onClick={()=>setPanelOpen(o=>!o)}
+        style={{padding:"8px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",userSelect:"none"}}>
+        <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,textTransform:"uppercase",letterSpacing:2,color:C.gray500}}>
+          {selected ? `${selected.w} vs ${selected.l}` : "Click any matchup to see result"}
         </div>
-        <div style={{display:"flex",gap:8}}>
-          {[[selected.w,true],[selected.l,false]].map(([name,win])=>(
-            <div key={name} style={{flex:1,padding:"14px 16px",borderRadius:10,border:`2px solid ${win?t.accent:t.border}`,background:win?`linear-gradient(135deg,${t.bg},${t.surface})`:t.surface,opacity:win?1:0.45}}>
-              {win&&<div style={{fontSize:9,color:t.accent,fontFamily:t.fontBody,textTransform:"uppercase",letterSpacing:1,marginBottom:4}}>👑 Winner</div>}
-              <div style={{fontSize:16,fontWeight:700,fontFamily:t.fontHeading,color:win?t.accent:t.text}}>{name}</div>
-            </div>
-          ))}
-        </div>
+        <span style={{fontSize:12,color:C.gray400,marginLeft:8}}>{panelOpen?"▼":"▲"}</span>
       </div>
-    );
-  };
+      {panelOpen && (
+        <div style={{padding:"0 20px 20px"}} className="slide-up">
+          {selected ? (
+            <div style={{display:"flex",gap:8}}>
+              {[[selected.w,true],[selected.l,false]].map(([name,win])=>(
+                <div key={name} style={{flex:1,padding:"14px 16px",borderRadius:10,border:`2px solid ${win?acc.accent:C.gray200}`,background:win?acc.accentBg:C.gray50,opacity:win?1:0.55}}>
+                  {win&&<div style={{fontSize:9,color:acc.accent,fontFamily:"'Barlow Condensed',sans-serif",textTransform:"uppercase",letterSpacing:1,marginBottom:4}}>Winner</div>}
+                  <div style={{fontSize:16,fontWeight:700,color:win?acc.accentDk:C.gray400}}>{name}</div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div style={{textAlign:"center",color:C.gray300,fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,textTransform:"uppercase",letterSpacing:2,padding:"12px 0"}}>No matchup selected</div>
+          )}
+        </div>
+      )}
+    </div>
+  );
 
   return (
-    <div style={{background:t.bg}}>
-      <div style={{borderBottom:`1px solid ${t.border}`,padding:"10px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",background:t.bg}}>
-        <div style={{fontFamily:t.fontBody,fontSize:11,textTransform:"uppercase",letterSpacing:2,color:t.dim}}>🏆 Champion: <span style={{color:t.accent,fontFamily:t.fontHeading,fontSize:14}}>{archive.champion}</span><span style={{color:t.text}}> — {archive.championArtist}</span></div>
+    <div style={{background:C.white,display:"flex",flexDirection:"column",flex:1,minHeight:0}}>
+      <div style={{borderBottom:`1px solid ${C.gray100}`,padding:"10px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",background:C.white,flexShrink:0}}>
+        <div style={{fontSize:11,textTransform:"uppercase",letterSpacing:2,color:C.gray500,fontFamily:"'Barlow Condensed',sans-serif"}}>
+          Champion: <span style={{color:acc.accentDk,fontFamily:"'Bebas Neue',sans-serif",fontSize:14}}>{archive.champion}</span>
+          <span style={{color:C.black}}> — {archive.championArtist}</span>
+        </div>
         <div style={{display:"flex",alignItems:"center",gap:6}}>
-          <span style={{fontFamily:t.fontBody,fontSize:11,color:t.dim,letterSpacing:1,marginRight:2}}>ZOOM</span>
-          {[["−",-0.1],[Math.round(zoom*100)+"%",0],["+",0.1]].map(([lbl,d],i)=>i===1?<span key="pct" style={{fontFamily:t.fontBody,fontSize:12,color:t.dim,minWidth:36,textAlign:"center"}}>{lbl}</span>:<button key={lbl} onClick={()=>adjZ(d)} style={{width:28,height:28,background:t.surface,border:`1px solid ${t.border}`,color:t.text,borderRadius:6,fontSize:16,display:"flex",alignItems:"center",justifyContent:"center"}}>{lbl}</button>)}
-          <button onClick={resetZ} style={{marginLeft:2,padding:"0 10px",height:28,background:t.surface,border:`1px solid ${t.border}`,color:t.dim,borderRadius:6,fontSize:11,fontFamily:t.fontBody,letterSpacing:1}}>RESET</button>
+          <span style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,color:C.gray500,letterSpacing:1,marginRight:2}}>ZOOM</span>
+          {[["−",-0.1],[Math.round(zoom*100)+"%",0],["+",0.1]].map(([lbl,d],i)=>i===1?<span key="pct" style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:12,color:C.gray500,minWidth:36,textAlign:"center"}}>{lbl}</span>:<button key={lbl} onClick={()=>adjZ(d)} style={{width:28,height:28,background:C.gray50,border:`1px solid ${C.gray200}`,color:C.black,borderRadius:6,fontSize:16,display:"flex",alignItems:"center",justifyContent:"center"}}>{lbl}</button>)}
+          <button onClick={resetZ} style={{marginLeft:2,padding:"0 10px",height:28,background:C.gray50,border:`1px solid ${C.gray200}`,color:C.gray600,borderRadius:6,fontSize:11,fontFamily:"'Barlow Condensed',sans-serif",letterSpacing:1}}>RESET</button>
         </div>
       </div>
-      <div ref={vpRef} style={{height:420,overflow:"auto",cursor:"grab",userSelect:"none",background:t.bracketBg}} onMouseDown={onMD} onMouseMove={onMM} onMouseUp={onMU} onMouseLeave={onMU} onTouchStart={onTS} onTouchMove={onTM} onTouchEnd={onTE}>
+      <div ref={vpRef} style={{flex:1,minHeight:0,overflow:"auto",cursor:"grab",userSelect:"none",background:C.gray50}}
+        onMouseDown={onMD} onMouseMove={onMM} onMouseUp={onMU} onMouseLeave={onMU}
+        onTouchStart={onTS} onTouchMove={onTM} onTouchEnd={onTE}>
         <div style={{minWidth:"100%",minHeight:"100%",width:Math.max(A_CANVAS_W*zoom+120,0),height:Math.max(A_CANVAS_H*zoom+80,0),display:"flex",alignItems:"center",justifyContent:"center"}}>
           <div style={{position:"relative",width:A_CANVAS_W,height:A_CANVAS_H,transform:`scale(${zoom})`,transformOrigin:"center center",flexShrink:0}}>
             <svg style={{position:"absolute",top:0,left:0,width:A_CANVAS_W,height:A_CANVAS_H,pointerEvents:"none"}}>{lines}</svg>
@@ -562,36 +540,68 @@ function ArchiveBracket({archive,theme}){
           </div>
         </div>
       </div>
-      <div style={{textAlign:"center",padding:"6px 0",borderBottom:`1px solid ${t.border}`,background:t.bg}}><span style={{fontFamily:t.fontBody,fontSize:10,textTransform:"uppercase",letterSpacing:2,color:t.border}}>Drag to pan · Scroll to zoom · Click any matchup to see result</span></div>
-      <div style={{background:t.bg}}><ResultPanel/></div>
+      <div style={{textAlign:"center",padding:"6px 0",borderBottom:`1px solid ${C.gray100}`,background:C.white,flexShrink:0}}>
+        <span style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,textTransform:"uppercase",letterSpacing:2,color:C.gray300}}>Drag to pan · Scroll to zoom · Click any matchup to see result</span>
+      </div>
+      <ResultPanel/>
     </div>
   );
 }
 
-// ── Archive card ──────────────────────────────────────────────────────────────
-function ArchiveCard({title,subtitle,isWinner,isChampion,isSelected,style,onClick,theme,extraClass}){
-  const t=theme;
+// ── Archive card (light theme) ────────────────────────────────────────────────
+function ArchiveCard({title,subtitle,isWinner,isChampion,isSelected,style,onClick,accent,accentBg,accentDk}){
   const [hov,setHov]=useState(false);
-  const border=isSelected?t.accent:isChampion?t.accent:isWinner?`${t.accent}66`:hov?`${t.accent}44`:t.border;
-  const bg=isChampion?`linear-gradient(135deg,${t.surface},${t.bg})`:isWinner?`linear-gradient(135deg,${t.bg},${t.surface})`:t.surface;
+  const borderColor=isSelected||isChampion?accent:isWinner?`${accent}88`:hov?`${accent}55`:C.gray200;
+  const bg=isChampion?accentBg:isWinner?C.white:C.gray50;
   return (
-    <div onClick={onClick} onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)} className={extraClass||""}
-      style={{...style,background:bg,border:`1.5px solid ${border}`,borderRadius:8,opacity:isWinner||isChampion?1:0.35,cursor:"pointer",transition:"border-color 0.12s,opacity 0.15s",padding:"0 10px",display:"flex",flexDirection:"column",justifyContent:"center",overflow:"hidden",boxSizing:"border-box",boxShadow:isChampion?`0 0 20px 4px ${t.accent}33`:"none"}}>
-      <div style={{fontSize:11,fontWeight:700,color:isWinner?t.accent:t.text,fontFamily:t.fontHeading,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",lineHeight:1.2}}>{isWinner&&<span style={{marginRight:4,fontSize:9}}>👑</span>}{title}</div>
-      {subtitle&&<div style={{fontSize:9,color:`${t.accent}88`,fontFamily:t.fontBody,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",marginTop:2}}>{subtitle}</div>}
+    <div onClick={onClick} onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
+      style={{...style,background:bg,border:`1.5px solid ${borderColor}`,borderRadius:6,
+        opacity:isWinner||isChampion?1:0.4,cursor:"pointer",transition:"border-color 0.12s,opacity 0.15s",
+        padding:"0 10px",display:"flex",flexDirection:"column",justifyContent:"center",
+        overflow:"hidden",boxSizing:"border-box",
+        boxShadow:isChampion?`0 2px 12px ${accent}33`:"none"}}>
+      <div style={{fontSize:11,fontWeight:700,color:isWinner?C.black:C.gray400,fontFamily:"'Barlow Condensed',sans-serif",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",lineHeight:1.2}}>
+        {isWinner&&<span style={{color:accent,marginRight:4}}>👑</span>}{title}
+      </div>
+      {subtitle&&<div style={{fontSize:9,color:C.gray500,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",marginTop:2}}>{subtitle}</div>}
     </div>
   );
 }
 
 // ── Vote card ─────────────────────────────────────────────────────────────────
-function VoteCard({m,voted,pending,setPending,confirmVote}){
+function VoteCard({m,voted,pending,setPending,confirmVote,highlight}){
   const uv=voted[m.id],pend=pending[m.id];
   const isLive=m.day===CURRENT_DAY,canVote=isLive&&!uv&&!m.locked;
   const tot=m.votes.a+m.votes.b;
   const showResults=!!uv||!!m.winner;
+  const [copied,setCopied]=useState(false);
+  const cardRef=useRef(null);
+
+  useEffect(()=>{
+    if(highlight&&cardRef.current){
+      setTimeout(()=>cardRef.current?.scrollIntoView({behavior:"smooth",block:"center"}),400);
+    }
+  },[highlight]);
+
+  const handleShare=()=>{
+    if(!uv) return;
+    const votedSong=uv==="a"?m.song1:m.song2;
+    const otherSong=uv==="a"?m.song2:m.song1;
+    const vPct=tot>0?Math.round(m.votes[uv]/tot*100):50;
+    const url=`${window.location.origin}?m=${m.id}`;
+    const text=`I voted for ${votedSong.title} over ${otherSong.title} — and ${vPct}% of voters agree. Cast your vote:`;
+    if(navigator.share){
+      navigator.share({title:"Music Madness · Best of the 70s",text:`${text} ${url}`}).catch(()=>{});
+    } else {
+      navigator.clipboard.writeText(`${text} ${url}`).then(()=>{
+        setCopied(true);
+        setTimeout(()=>setCopied(false),2500);
+      });
+    }
+  };
 
   return (
-    <div className="fade-up" style={{background:C.white,border:`1.5px solid ${isLive?C.yellow:C.gray200}`,borderRadius:12,overflow:"hidden",marginBottom:12,boxShadow:isLive?`0 2px 12px rgba(230,205,9,0.15)`:`0 1px 4px rgba(0,0,0,0.06)`}}>
+    <div ref={cardRef} className="fade-up" style={{background:C.white,border:`1.5px solid ${highlight?C.yellow:isLive?C.yellow:C.gray200}`,borderRadius:12,overflow:"hidden",marginBottom:12,boxShadow:highlight?`0 0 0 3px ${C.yellow}55, 0 2px 12px rgba(230,205,9,0.2)`:isLive?`0 2px 12px rgba(230,205,9,0.15)`:`0 1px 4px rgba(0,0,0,0.06)`}}>
       <div style={{padding:"12px 16px 0",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
           {isLive&&<span className="live-dot" style={{display:"inline-block",width:7,height:7,borderRadius:"50%",background:C.yellow,flexShrink:0}}/>}
@@ -635,7 +645,17 @@ function VoteCard({m,voted,pending,setPending,confirmVote}){
             Confirm Vote
           </button>
         )}
-        {uv&&<div style={{marginTop:8,textAlign:"center",fontSize:12,color:C.green,fontWeight:600}}>✓ Your vote is in</div>}
+        {uv&&(
+          <div style={{marginTop:10,display:"flex",alignItems:"center",justifyContent:"space-between",gap:10}}>
+            <div style={{fontSize:12,color:C.green,fontWeight:600}}>✓ Your vote is in</div>
+            <button onClick={handleShare}
+              style={{display:"flex",alignItems:"center",gap:6,padding:"6px 14px",background:C.black,border:"none",borderRadius:8,color:C.white,fontSize:12,fontWeight:700,fontFamily:"'Barlow Condensed',sans-serif",textTransform:"uppercase",letterSpacing:1,cursor:"pointer",transition:"background 0.15s",flexShrink:0}}
+              onMouseEnter={e=>e.currentTarget.style.background=C.gray800}
+              onMouseLeave={e=>e.currentTarget.style.background=C.black}>
+              {copied?"Copied!":"Share ↗"}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -651,6 +671,11 @@ export default function App(){
   const [view,setView]=useState("vote");
   const [activeArchive,setActiveArchive]=useState(null);
   const [selectedMatchup,setSelectedMatchup]=useState(null);
+  const [highlightId,setHighlightId]=useState(()=>{
+    const p=new URLSearchParams(window.location.search);
+    const id=parseInt(p.get("m"));
+    return isNaN(id)?null:id;
+  });
 
   const viewportRef=useRef(null);
   const panRef=useRef({on:false,sx:0,sy:0,sl:0,st:0});
@@ -751,6 +776,7 @@ export default function App(){
   const REGION_H=16*BASE_SLOT_H;
 
   const renderRegion=(tree,getX,pixelOffsetY=0)=>{
+    const isLeft=getX===leftX;
     const cards=[],paths=[];
     const lcy=(r,k)=>pixelOffsetY+cardCY(r,k);
     tree.forEach((round,r)=>{
@@ -765,14 +791,26 @@ export default function App(){
           const isWin=wKey===side,isLose=wKey&&wKey!==side;
           const isSel=selectedMatchup?.id===slot.m?.id;
           cards.push(<BNode key={`${r}-${k}-${ei}-${pixelOffsetY}`} song={song} x={x} y={cy} isWinner={isWin} isLoser={isLose} isLive={isLive} isPast={isPast} isFuture={isFuture} unlockDay={slot.m?.day} isSelected={isSel} onClick={()=>{if(isLive||isPast)setSelectedMatchup(slot.m);}}/>);
-          if(r<tree.length-1&&ei===0){
-            const nextCY=lcy(r+1,Math.floor(k/2)*2);
-            const x1=getX(r)+(getX===leftX?CARD_W:0);
-            const x2=getX(r+1)+(getX===leftX?0:CARD_W);
-            const mx=(x1+x2)/2;
-            paths.push(<path key={`p-${r}-${k}-${pixelOffsetY}`} d={`M${x1},${cy} C${mx},${cy} ${mx},${nextCY} ${x2},${nextCY}`} fill="none" stroke={C.gray200} strokeWidth={1.5}/>);
-          }
         });
+        // Draw bracket connector after placing both cards
+        if(r<tree.length-1){
+          const cy0=lcy(r,k*2);    // top card center
+          const cy1=lcy(r,k*2+1);  // bottom card center
+          const midY=(cy0+cy1)/2;
+          // The winner feeds into slot floor(k/2) of next round
+          // For left regions, winner is top of the next-round pair (ei=0 → slot k*2)
+          // For right regions same — winner is the same relative slot
+          const nextCY=lcy(r+1, k);
+          // Bar edge: right side for left regions, left side for right regions
+          const barX = isLeft ? getX(r)+CARD_W : getX(r);
+          const nextEdgeX = isLeft ? getX(r+1) : getX(r+1)+CARD_W;
+          // Vertical bar connecting both seeds
+          paths.push(<line key={`vbar-${r}-${k}-${pixelOffsetY}`} x1={barX} y1={cy0} x2={barX} y2={cy1} stroke={C.gray200} strokeWidth={1.5}/>);
+          // Horizontal from midpoint to next round card edge, then vertical to card center
+          paths.push(<polyline key={`conn-${r}-${k}-${pixelOffsetY}`}
+            points={`${barX},${midY} ${nextEdgeX},${midY} ${nextEdgeX},${nextCY}`}
+            fill="none" stroke={C.gray200} strokeWidth={1.5}/>);
+        }
       });
     });
     return{cards,paths};
@@ -831,13 +869,13 @@ export default function App(){
           <div style={{width:48,height:3,background:C.yellow,marginTop:10,borderRadius:2}}/>
         </div>
         {ARCHIVES.map(a=>{
-          const t=THEMES[YEAR_THEME[a.year]];
+          const acc=ARCHIVE_ACCENTS[a.year];
           return (
             <div key={a.year} onClick={()=>{setActiveArchive(a);setView("archiveDetail");}}
               style={{border:`1.5px solid ${C.gray200}`,borderRadius:12,marginBottom:12,cursor:"pointer",overflow:"hidden",transition:"border-color 0.15s,box-shadow 0.15s",background:C.white}}
-              onMouseEnter={e=>{e.currentTarget.style.borderColor=C.yellow;e.currentTarget.style.boxShadow=`0 4px 16px rgba(230,205,9,0.2)`;}}
+              onMouseEnter={e=>{e.currentTarget.style.borderColor=acc.accent;e.currentTarget.style.boxShadow=`0 4px 16px ${acc.accent}33`;}}
               onMouseLeave={e=>{e.currentTarget.style.borderColor=C.gray200;e.currentTarget.style.boxShadow="none";}}>
-              <div style={{height:4,background:`linear-gradient(to right,${t.accent},${t.accent2})`}}/>
+              <div style={{height:4,background:`linear-gradient(to right,${acc.accent},${acc.accentBg})`}}/>
               <div style={{padding:"16px 20px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                 <div>
                   <div style={{fontSize:11,textTransform:"uppercase",letterSpacing:2,color:C.gray500,fontFamily:"'Barlow Condensed',sans-serif",marginBottom:4}}>{a.year}</div>
@@ -854,20 +892,21 @@ export default function App(){
   );
 
   if(view==="archiveDetail"&&activeArchive){
-    const a=activeArchive,t=THEMES[YEAR_THEME[a.year]];
+    const a=activeArchive;
+    const acc=ARCHIVE_ACCENTS[a.year];
     return (
-      <div style={{minHeight:"100vh",background:t.bg}}>
-        <style>{buildArchiveCss(t)}</style>
+      <div style={{height:"100vh",overflow:"hidden",background:C.white,display:"flex",flexDirection:"column"}}>
+        <style>{buildArchiveCss()}</style>
         <Header/>
-        <div style={{paddingTop:56}}>
-          <div style={{borderBottom:`1px solid ${t.border}`,padding:"14px 20px",display:"flex",alignItems:"center",gap:16,background:t.bg,position:"sticky",top:56,zIndex:100}}>
-            <button onClick={()=>setView("archive")} style={{background:"none",border:`1px solid ${t.border}`,color:t.dim,borderRadius:8,padding:"5px 12px",fontSize:12,fontFamily:"'Barlow Condensed',sans-serif",textTransform:"uppercase",letterSpacing:1,flexShrink:0}}>← Archives</button>
+        <div style={{flex:1,display:"flex",flexDirection:"column",paddingTop:56,minHeight:0}}>
+          <div style={{borderBottom:`1px solid ${C.gray100}`,padding:"10px 20px",display:"flex",alignItems:"center",gap:16,background:C.white,flexShrink:0}}>
+            <button onClick={()=>setView("archive")} style={{background:"none",border:`1px solid ${C.gray200}`,color:C.gray500,borderRadius:8,padding:"5px 12px",fontSize:12,fontFamily:"'Barlow Condensed',sans-serif",textTransform:"uppercase",letterSpacing:1,flexShrink:0}}>← Archives</button>
             <div>
-              <div style={{fontFamily:t.fontHeading,fontSize:11,textTransform:"uppercase",letterSpacing:3,color:t.accent,marginBottom:2}}>{a.year}</div>
-              <div style={{fontFamily:t.fontHeading,fontSize:22,lineHeight:1,color:t.text}}>{a.theme}</div>
+              <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,textTransform:"uppercase",letterSpacing:3,color:acc.accent,marginBottom:2}}>{a.year}</div>
+              <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:22,lineHeight:1,color:C.black}}>{a.theme}</div>
             </div>
           </div>
-          <ArchiveBracket archive={a} theme={t}/>
+          <ArchiveBracket archive={a}/>
         </div>
       </div>
     );
@@ -893,12 +932,73 @@ export default function App(){
         <div ref={viewportRef} style={{flex:1,overflow:"auto",cursor:"grab",userSelect:"none",background:C.gray50}} onMouseDown={onMD} onMouseMove={onMM} onMouseUp={onMU} onMouseLeave={onMU} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
           <div style={{minWidth:"100%",minHeight:"100%",width:Math.max(CANVAS_W*zoom+120,0),height:Math.max(CANVAS_H*zoom+80,0),display:"flex",alignItems:"center",justifyContent:"center"}}>
             <div style={{position:"relative",width:CANVAS_W,height:CANVAS_H,transform:`scale(${zoom})`,transformOrigin:"center center",flexShrink:0}}>
-              <svg style={{position:"absolute",top:0,left:0,width:CANVAS_W,height:CANVAS_H,pointerEvents:"none"}}>
-                {ePaths}{nPaths}{wPaths}{sPaths}
-                {[FINAL_Y+CARD_H/2,FINAL_Y+CARD_H*1.5+10].map((y,i)=>(
-                  <g key={i}><line x1={REGION_W} y1={y} x2={FINAL_X} y2={y} stroke={C.gray200} strokeWidth={1.5}/><line x1={RIGHT_BASE_X} y1={y} x2={FINAL_X+CARD_W} y2={y} stroke={C.gray200} strokeWidth={1.5}/></g>
-                ))}
-              </svg>
+              {(()=>{
+                const sw = C.gray200;
+                // E8 bar edges
+                const eBarX = leftX(3) + CARD_W, nBarX = leftX(3) + CARD_W;
+                const wBarX = rightX(3), sBarX = rightX(3);
+                // E8 card centers (each region has 1 E8 matchup, 2 cards)
+                const eTop=cardCY(3,0), eBot=cardCY(3,1);
+                const nTop=REGION_H+cardCY(3,0), nBot=REGION_H+cardCY(3,1);
+                const wTop=cardCY(3,0), wBot=cardCY(3,1);
+                const sTop=REGION_H+cardCY(3,0), sBot=REGION_H+cardCY(3,1);
+                const eMid=(eTop+eBot)/2, nMid=(nTop+nBot)/2;
+                const wMid=(wTop+wBot)/2, sMid=(sTop+sBot)/2;
+                // Semi card positions (left side: East top, North bottom)
+                const sLTopCY=eMid, sLBotCY=nMid, sRTopCY=wMid, sRBotCY=sMid;
+                // Final cards centered between the two semis on each side
+                const finalCY=(sLTopCY+sLBotCY)/2;
+                const finalTopCY=finalCY-CARD_H/2-6, finalBotCY=finalCY+CARD_H/2+6;
+                // E8 winners
+                const rWin = ms => { const m=ms[ms.length-1]; return m?.winner ? (m.winner==="a"?m.song1:m.song2) : null; };
+                const eastSemi=rWin(eastMs), northSemi=rWin(northMs), westSemi=rWin(westMs), southSemi=rWin(southMs);
+                const mkSCard=(song,x,cy)=>(
+                  <div key={`sc-${x}-${cy}`} style={{position:"absolute",left:x,top:cy-CARD_H/2,width:CARD_W,height:CARD_H,
+                    background:C.white,border:`1.5px solid ${song?C.gray700:C.gray200}`,borderRadius:6,
+                    display:"flex",flexDirection:"column",justifyContent:"center",padding:"0 10px",overflow:"hidden"}}>
+                    {song?<>
+                      <div style={{fontSize:9,color:C.gray500,fontFamily:"'Barlow Condensed',sans-serif",textTransform:"uppercase",letterSpacing:1}}>#{song.seed} · {song.year}</div>
+                      <div style={{fontSize:12,fontWeight:700,color:C.black,fontFamily:"'Barlow Condensed',sans-serif",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{song.title}</div>
+                      <div style={{fontSize:10,color:C.gray500,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{song.artist}</div>
+                    </>:<span style={{fontSize:10,color:C.gray300,fontFamily:"'Barlow Condensed',sans-serif"}}>TBD</span>}
+                  </div>
+                );
+                const mkFCard=(cy)=>(
+                  <div key={`fc-${cy}`} style={{position:"absolute",left:FINAL_X,top:cy-CARD_H/2,width:CARD_W,height:CARD_H,
+                    background:C.white,border:`1.5px dashed ${C.gray200}`,borderRadius:6,
+                    display:"flex",alignItems:"center",justifyContent:"center"}}>
+                    <span style={{fontSize:10,color:C.gray300,fontFamily:"'Barlow Condensed',sans-serif"}}>TBD</span>
+                  </div>
+                );
+                return (<>
+                  <svg style={{position:"absolute",top:0,left:0,width:CANVAS_W,height:CANVAS_H,pointerEvents:"none"}}>
+                    {ePaths}{nPaths}{wPaths}{sPaths}
+                    {/* E8 vertical bars */}
+                    <line x1={eBarX} y1={eTop} x2={eBarX} y2={eBot} stroke={sw} strokeWidth={1.5}/>
+                    <line x1={nBarX} y1={nTop} x2={nBarX} y2={nBot} stroke={sw} strokeWidth={1.5}/>
+                    <line x1={wBarX} y1={wTop} x2={wBarX} y2={wBot} stroke={sw} strokeWidth={1.5}/>
+                    <line x1={sBarX} y1={sTop} x2={sBarX} y2={sBot} stroke={sw} strokeWidth={1.5}/>
+                    {/* E8 midpoint → Semi cards */}
+                    <line x1={eBarX} y1={eMid} x2={SEMI_L_X} y2={eMid} stroke={sw} strokeWidth={1.5}/>
+                    <line x1={nBarX} y1={nMid} x2={SEMI_L_X} y2={nMid} stroke={sw} strokeWidth={1.5}/>
+                    <line x1={wBarX} y1={wMid} x2={SEMI_R_X+CARD_W} y2={wMid} stroke={sw} strokeWidth={1.5}/>
+                    <line x1={sBarX} y1={sMid} x2={SEMI_R_X+CARD_W} y2={sMid} stroke={sw} strokeWidth={1.5}/>
+                    {/* Left semi vbar + elbow to Final */}
+                    <line x1={SEMI_L_X+CARD_W} y1={sLTopCY} x2={SEMI_L_X+CARD_W} y2={sLBotCY} stroke={sw} strokeWidth={1.5}/>
+                    <polyline points={`${SEMI_L_X+CARD_W},${(sLTopCY+sLBotCY)/2} ${FINAL_X},${(sLTopCY+sLBotCY)/2} ${FINAL_X},${finalTopCY}`} fill="none" stroke={sw} strokeWidth={1.5}/>
+                    {/* Right semi vbar + elbow to Final */}
+                    <line x1={SEMI_R_X} y1={sRTopCY} x2={SEMI_R_X} y2={sRBotCY} stroke={sw} strokeWidth={1.5}/>
+                    <polyline points={`${SEMI_R_X},${(sRTopCY+sRBotCY)/2} ${FINAL_X+CARD_W},${(sRTopCY+sRBotCY)/2} ${FINAL_X+CARD_W},${finalBotCY}`} fill="none" stroke={sw} strokeWidth={1.5}/>
+                  </svg>
+                  {mkSCard(eastSemi,  SEMI_L_X, sLTopCY)}
+                  {mkSCard(northSemi, SEMI_L_X, sLBotCY)}
+                  {mkSCard(westSemi,  SEMI_R_X, sRTopCY)}
+                  {mkSCard(southSemi, SEMI_R_X, sRBotCY)}
+                  <div key="final-label" style={{position:"absolute",left:FINAL_X,top:Math.min(finalTopCY,finalBotCY)-CARD_H/2-22,width:CARD_W,textAlign:"center",fontFamily:"'Barlow Condensed',sans-serif",fontSize:9,textTransform:"uppercase",letterSpacing:2,color:C.yellow}}>🏆 Final</div>
+                  {mkFCard(finalTopCY)}
+                  {mkFCard(finalBotCY)}
+                </>);
+              })()}
               {eCards}{nCards}{wCards}{sCards}
               {[["East",0,0],["North",0,REGION_H],["West",1,0],["South",1,REGION_H]].map(([label,side,yo])=>(
                 <div key={label} style={{position:"absolute",[side===0?"left":"right"]:0,top:yo+10,fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,textTransform:"uppercase",letterSpacing:3,color:C.yellow,fontWeight:700}}>{label}</div>
@@ -906,14 +1006,8 @@ export default function App(){
               {["R64","R32","S16","E8"].map((l,r)=>(
                 <div key={r} style={{position:"absolute",left:leftX(r),top:26,width:CARD_W,textAlign:"center",fontFamily:"'Barlow Condensed',sans-serif",fontSize:9,color:C.gray300,textTransform:"uppercase",letterSpacing:1}}>{l}</div>
               ))}
-              <div style={{position:"absolute",left:FINAL_X,top:FINAL_Y-20,width:CARD_W}}>
-                <div style={{textAlign:"center",fontFamily:"'Barlow Condensed',sans-serif",fontSize:9,textTransform:"uppercase",letterSpacing:2,color:C.gray400,marginBottom:6}}>🏆 Final</div>
-                {[0,1].map(i=>(
-                  <div key={i} style={{height:CARD_H,background:C.white,border:`1.5px dashed ${C.gray200}`,borderRadius:6,display:"flex",alignItems:"center",justifyContent:"center",marginBottom:i===0?8:0}}>
-                    <span style={{color:C.gray300,fontSize:10,fontFamily:"'Barlow Condensed',sans-serif"}}>TBD</span>
-                  </div>
-                ))}
-              </div>
+              <div style={{position:"absolute",left:SEMI_L_X,top:26,width:CARD_W,textAlign:"center",fontFamily:"'Barlow Condensed',sans-serif",fontSize:9,color:C.gray300,textTransform:"uppercase",letterSpacing:1}}>Final 4</div>
+              <div style={{position:"absolute",left:FINAL_X,top:26,width:CARD_W,textAlign:"center",fontFamily:"'Barlow Condensed',sans-serif",fontSize:9,color:C.gray300,textTransform:"uppercase",letterSpacing:1}}>Final</div>
             </div>
           </div>
         </div>
@@ -944,12 +1038,12 @@ export default function App(){
               <div style={{fontSize:22,fontWeight:900,fontFamily:"'Bebas Neue',sans-serif",letterSpacing:1,color:C.black,lineHeight:1}}>Day {CURRENT_DAY} Matchups</div>
             </div>
           </div>
-          {todayMs.map(m=><VoteCard key={m.id} m={m} voted={voted} pending={pending} setPending={setPending} confirmVote={confirmVote}/>)}
+          {todayMs.map(m=><VoteCard key={m.id} m={m} voted={voted} pending={pending} setPending={setPending} confirmVote={confirmVote} highlight={m.id===highlightId}/>)}
         </div>
         {pastMs.length>0&&(
           <div>
             <div style={{fontSize:11,textTransform:"uppercase",letterSpacing:2,color:C.gray500,fontFamily:"'Barlow Condensed',sans-serif",marginBottom:12,paddingTop:16,borderTop:`1px solid ${C.gray200}`}}>Previous Results</div>
-            {pastMs.map(m=><VoteCard key={m.id} m={m} voted={voted} pending={pending} setPending={setPending} confirmVote={confirmVote}/>)}
+            {pastMs.map(m=><VoteCard key={m.id} m={m} voted={voted} pending={pending} setPending={setPending} confirmVote={confirmVote} highlight={m.id===highlightId}/>)}
           </div>
         )}
       </div>
