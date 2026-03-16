@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Trophy, Crown, Lock, Check, X } from "lucide-react";
+import { Trophy, Crown, Lock, Check, X, Play, ChevronDown } from "lucide-react";
 import { supabase } from "./supabase.js";
 
 // ── Voter token ───────────────────────────────────────────────────────────────
@@ -34,7 +34,7 @@ const C = {
 };
 
 // ── Layout constants ──────────────────────────────────────────────────────────
-const CURRENT_DAY = 3;
+const CURRENT_DAY = 0;
 const CARD_W = 150, CARD_H = 52, ROUND_GAP_X = 44, BASE_SLOT_H = 88;
 
 // ── Global CSS ────────────────────────────────────────────────────────────────
@@ -71,58 +71,176 @@ const buildArchiveCss = () => GLOBAL_CSS;
 // ── Song data ─────────────────────────────────────────────────────────────────
 const S = (id,seed,title,artist,year) => ({id,seed,title,artist,year});
 const SONGS = [
-  S(1,1,"Bohemian Rhapsody","Queen",1975), S(2,16,"Hotel California","Eagles",1977),
-  S(3,8,"Superstition","Stevie Wonder",1972), S(4,9,"Go Your Own Way","Fleetwood Mac",1977),
-  S(5,5,"Le Freak","Chic",1978), S(6,12,"Dancing Queen","ABBA",1976),
-  S(7,4,"Stayin' Alive","Bee Gees",1977), S(8,13,"September","EW&F",1978),
-  S(9,6,"Dreams","Fleetwood Mac",1977), S(10,11,"Roxanne","The Police",1978),
-  S(11,3,"Sir Duke","Stevie Wonder",1977), S(12,14,"Ring My Bell","Anita Ward",1979),
-  S(13,7,"Papa Was a Rollin' Stone","Temptations",1972), S(14,10,"Heart of Glass","Blondie",1978),
-  S(15,2,"Rocket Man","Elton John",1972), S(16,15,"Love Will Keep Us Together","Captain & Tennille",1975),
-  S(17,1,"Stairway to Heaven","Led Zeppelin",1971), S(18,16,"American Pie","Don McLean",1971),
-  S(19,8,"Brown Sugar","Rolling Stones",1971), S(20,9,"What's Going On","Marvin Gaye",1971),
-  S(21,5,"Born to Run","Bruce Springsteen",1975), S(22,12,"I Will Survive","Gloria Gaynor",1978),
-  S(23,4,"Good Times","Chic",1979), S(24,13,"Jolene","Dolly Parton",1973),
-  S(25,6,"Rapper's Delight","Sugarhill Gang",1979), S(26,11,"Imagine","John Lennon",1971),
-  S(27,3,"Let's Stay Together","Al Green",1972), S(28,14,"Cat's in the Cradle","Harry Chapin",1974),
-  S(29,7,"Don't Stop Me Now","Queen",1978), S(30,10,"Tiny Dancer","Elton John",1971),
-  S(31,2,"Immigrant Song","Led Zeppelin",1970), S(32,15,"Heart of Gold","Neil Young",1972),
-  S(33,1,"Good Vibrations","Beach Boys",1966), S(34,16,"Funkytown","Lipps Inc",1980),
-  S(35,8,"Knock on Wood","Eddie Floyd",1966), S(36,9,"Fire","Jimi Hendrix",1967),
-  S(37,5,"What I Am","Edie Brickell",1988), S(38,12,"Roxanne","The Police",1979),
-  S(39,4,"Free Bird","Lynyrd Skynyrd",1973), S(40,13,"Take It Easy","Eagles",1972),
-  S(41,6,"Midnight Rider","Allman Brothers",1970), S(42,11,"After Midnight","Eric Clapton",1970),
-  S(43,3,"Layla","Derek & Dominos",1970), S(44,14,"Black Water","Doobie Brothers",1974),
-  S(45,7,"Dark Side of the Moon","Pink Floyd",1973), S(46,10,"Fool in the Rain","Led Zeppelin",1979),
-  S(47,2,"More Than a Feeling","Boston",1976), S(48,15,"Rock and Roll All Nite","KISS",1975),
-  S(49,1,"Superstition","Stevie Wonder",1972), S(50,16,"Shake Your Groove Thing","Peaches & Herb",1978),
-  S(51,8,"Pick Up the Pieces","AWB",1974), S(52,9,"Car Wash","Rose Royce",1976),
-  S(53,5,"Play That Funky Music","Wild Cherry",1976), S(54,12,"The Hustle","Van McCoy",1975),
-  S(55,4,"Got to Give It Up","Marvin Gaye",1977), S(56,13,"Jungle Boogie","Kool & the Gang",1973),
-  S(57,6,"We Are Family","Sister Sledge",1979), S(58,11,"Brick House","Commodores",1977),
-  S(59,3,"Give Up the Funk","Parliament",1976), S(60,14,"Shining Star","EW&F",1975),
-  S(61,7,"Boogie Wonderland","EW&F",1979), S(62,10,"Don't Leave Me This Way","Thelma Houston",1976),
-  S(63,2,"Use Me","Bill Withers",1972), S(64,15,"Higher Ground","Stevie Wonder",1973),
+  // WOODSTOCK (ids 1-16)
+  S(1,1,"Free Bird","Lynyrd Skynyrd",1973),
+  S(2,16,"Roxanne","The Police",1978),
+  S(3,8,"Tell Me Something Good","Rufus",1974),
+  S(4,9,"Rocky Mountain Way","Joe Walsh",1973),
+  S(5,5,"Born to Run","Bruce Springsteen",1975),
+  S(6,12,"War Pigs","Black Sabbath",1970),
+  S(7,4,"Sir Duke","Stevie Wonder",1977),
+  S(8,13,"Brandy","Looking Glass",1972),
+  S(9,6,"Dance The Night Away","Van Halen",1979),
+  S(10,11,"Let's Stay Together","Al Green",1972),
+  S(11,3,"Fire And Rain","James Taylor",1970),
+  S(12,14,"Ventura Highway","America",1972),
+  S(13,7,"Can't You Hear Me Knockin","Rolling Stones",1971),
+  S(14,10,"Jamming","Bob Marley",1977),
+  S(15,2,"Stairway to Heaven","Led Zeppelin",1971),
+  S(16,15,"Angel","Jimi Hendrix",1971),
+  // WATERGATE (ids 17-32)
+  S(17,1,"The Chain","Fleetwood Mac",1977),
+  S(18,16,"Summer Breeze","Seals & Crofts",1972),
+  S(19,8,"Rebel Rebel","David Bowie",1974),
+  S(20,9,"Kodachrome","Paul Simon",1973),
+  S(21,5,"Gimme! Gimme! Gimme!","ABBA",1979),
+  S(22,12,"Stay With Me","Faces",1971),
+  S(23,4,"Tiny Dancer","Elton John",1971),
+  S(24,13,"Scarlet Begonias","Grateful Dead",1974),
+  S(25,6,"Dixie Chicken","Little Feat",1973),
+  S(26,11,"Me and Bobby McGee","Kris Kristofferson",1971),
+  S(27,3,"I Will Survive","Gloria Gaynor",1978),
+  S(28,14,"Stayin Alive","Bee Gees",1977),
+  S(29,7,"Bennie and the Jets","Elton John",1973),
+  S(30,10,"Fly Like an Eagle","Steve Miller Band",1976),
+  S(31,2,"Tumbling Dice","Rolling Stones",1972),
+  S(32,15,"Crazy On You","Heart",1976),
+  // HAIGHT-ASHBURY (ids 33-48)
+  S(33,1,"Dreams","Fleetwood Mac",1977),
+  S(34,16,"Superstition","Stevie Wonder",1972),
+  S(35,8,"Night Moves","Bob Seger",1976),
+  S(36,9,"Going to California","Led Zeppelin",1971),
+  S(37,5,"Into the Mystic","Van Morrison",1970),
+  S(38,12,"The Joker","Steve Miller Band",1973),
+  S(39,4,"You're So Vain","Carly Simon",1972),
+  S(40,13,"The Boxer","Simon & Garfunkel",1969),
+  S(41,6,"What's Going On","Marvin Gaye",1971),
+  S(42,11,"American Girl","Tom Petty",1976),
+  S(43,3,"Let The Good Times Roll","The Cars",1978),
+  S(44,14,"Wonderful World Beautiful People","Jimmy Cliff",1969),
+  S(45,7,"Sweet Home Alabama","Lynyrd Skynyrd",1974),
+  S(46,10,"Lovely Day","Bill Withers",1977),
+  S(47,2,"Margaritaville","Jimmy Buffett",1977),
+  S(48,15,"Rock Lobster","B-52s",1979),
+  // LAUREL CANYON (ids 49-64)
+  S(49,1,"Bohemian Rhapsody","Queen",1975),
+  S(50,16,"Shining Star","Earth Wind & Fire",1975),
+  S(51,8,"Blue Sky","Allman Brothers",1972),
+  S(52,9,"Jolene","Dolly Parton",1973),
+  S(53,5,"Band on the Run","Paul McCartney",1973),
+  S(54,12,"Taking it to The Streets","Doobie Brothers",1976),
+  S(55,4,"Sweet Emotion","Aerosmith",1975),
+  S(56,13,"Walk on the Wild Side","Lou Reed",1972),
+  S(57,6,"Friend of the Devil","Grateful Dead",1970),
+  S(58,11,"My Sweet Lord","George Harrison",1970),
+  S(59,3,"The Boys Are Back In Town","Thin Lizzy",1976),
+  S(60,14,"Angel From Montgomery","Bonnie Raitt",1974),
+  S(61,7,"Fool In The Rain","Led Zeppelin",1979),
+  S(62,10,"Rocky Mountain High","John Denver",1972),
+  S(63,2,"Wish You Were Here","Pink Floyd",1975),
+  S(64,15,"Beast of Burden","Rolling Stones",1978),
 ];
 const byId = id => SONGS.find(s => s.id === id);
 
+// ── Spotify track IDs ─────────────────────────────────────────────────────────
+// Format: "Song Title": "spotify_track_id"
+// Get IDs from open.spotify.com — share a track → copy link → extract ID after /track/
+const SPOTIFY_IDS = {
+  // Les
+  "Free Bird":                        "5EWPGh7jbTNO2wakv8LjUI",
+  "Tumbling Dice":                    "4hq0S6wznq7SHDyMOFXL9i",
+  "Let The Good Times Roll":          "7hVhRCDV100Jq26NGR7adw",
+  "Sweet Emotion":                    "73TxYZd0lBCVRrHawrAglA",
+  "Born to Run":                      "6hTcuIQa0sxrrByu9wTD7s",
+  "Dixie Chicken":                    "4fTmkN3MM1BCNfB8SOAO8C",
+  "Sweet Home Alabama":               "7e89621JPkKaeDSTQ3avtg",
+  "Blue Sky":                         "1jjExXOVambZfZwnSgR6qR",
+  "Rocky Mountain Way":               "01FhWN14hzwMNYQg2I5vjk",
+  "Fly Like an Eagle":                "206ttXt6yHnDAMRX1EsTfu",
+  "American Girl":                    "4xTAZryRjpJq6JiCCpIQpl",
+  "Taking it to The Streets":         "1UBxiGQ2blRKft3csoK9H8",
+  "Brandy":                           "2BY7ALEWdloFHgQZG6VMLA",
+  "Stayin Alive":                     "2xSXw1EqGSAKc1e4TPaQvV",
+  "Rock Lobster":                     "5WTczGDHrrqEEo6mHjGrAD",
+  "Shining Star":                     "0RgcOUQg4qYAEt9RIdf3oB",
+  // Casey
+  "The Chain":                        "5e9TFTbltYBg2xThimr0rU",
+  "Margaritaville":                   "57FvuUotRyzRl8hwIhCVuO",
+  "The Boys Are Back In Town":        "4QEbXYWpDDWHzXNINdZlzW",
+  "Sir Duke":                         "4pNiE4LCVV74vfIBaUHm1b",
+  "Gimme! Gimme! Gimme!":             "3vkQ5DAB1qQMYO4Mr9zJN6",
+  "What's Going On":                  "3Um9toULmYFGCpvaIPFw7l",
+  "Fool In The Rain":                 "3i25w2HOWoafnTIiWJCL71",
+  "Tell Me Something Good":           "51LUPBmI8ZlJTVVYrWdbxZ",
+  "Kodachrome":                       "0UlwTmT01jdFp3BaofARtU",
+  "Lovely Day":                       "0bRXwKfigvpKZUurwqAlEh",
+  "My Sweet Lord":                    "0KZodeWxqxd88F9wY1cqgs",
+  "War Pigs":                         "0HVQuuXGAcQ2P5mBN521ae",
+  "Scarlet Begonias":                 "3euDGpS2R0NC2Xssqxohva",
+  "Wonderful World Beautiful People": "7vCEPLGrLHqBHyRPPsweYY",
+  // From your second batch (in order you gave)
+  "Beast of Burden":                  "0832Tptls5YicHPGgw7ssP",
+  "Roxanne":                          "3EYOJ48Et32uATr9ZmLnAo",
+  "Dreams":                           "1lbXEepatjRVjoG8pZMtdp",
+  "Wish You Were Here":               "6mFkJmJqdDVQ1REhVfGgd1",
+  "Fire And Rain":                    "1oht5GevPN9t1T3kG1m1GO",
+  "Tiny Dancer":                      "2TVxnKdb3tqe1nhQWwwZCO",
+  "Into the Mystic":                  "3lh3iiiJeiBXHSZw6u0kh6",
+  "Friend of the Devil":              "1kMmDBfMsOrtIkKKzRIBA3",
+  "Rebel Rebel":                      "7jM6G4kPdnTuvXgOs7JVgK",
+  "Going to California":              "70gbuMqwNBE2Y5rkQJE9By",
+  "Rocky Mountain High":              "1ne9wOtDF2jM6Cm8WBkaER",
+  "Let's Stay Together":              "63xdwScd1Ai1GigAwQxE8y",
+  "Stay With Me":                     "7fLTytvnvxy653VWxflTRf",
+  "The Boxer":                        "76TZCvJ8GitQ2FA1q5dKu0",
+  "Angel From Montgomery":            "6JssQFiBCi6ZcE6060S9A7",
+  "Angel":                            "0QenQiXnBs7s9fBWGluD17",
+  "Summer Breeze":                    "3B0ms7Xlxl16tRztKHpcu9",
+  "Bohemian Rhapsody":                "4q0ga6PujERMThC4FXO4WV",
+  "Stairway to Heaven":               "5CQ30WqJwcep0pYcV4AMNc",
+  "I Will Survive":                   "7cv28LXcjAC3GsXbUvXKbX",
+  "You're So Vain":                   "2DnJjbjNTV9Nd5NOa1KGba",
+  "Band on the Run":                  "4kaDCOKdPt1GRrNGkCZlsn",
+  "Dance The Night Away":             "4RS9PmtHQe7I0o5fEeweOY",
+  "Bennie and the Jets":              "5Wj1rJnCLpMHdLaxsFtJLs",
+  "Night Moves":                      "6UBjSnyP1O5W5ndJoO9vUk",
+  "Jolene":                           "2SpEHTbUuebeLkgs9QB7Ue",
+  "Jamming":                          "4aUCPal9bxTnQkEfdIY6sG",
+  "Me and Bobby McGee":               "3X4IQODzJjZnWeWaqj269w",
+  "The Joker":                        "6FKU84JHM1lbiy5Dx0Dyqd",
+  "Walk on the Wild Side":            "5p3JunprHCxClJjOmcLV8G",
+  "Ventura Highway":                  "4ILT1Vm2G084rs5IrjhRQq",
+  "Crazy On You":                     "5zH710lFSLtkHbMkslLDjR",
+  "Superstition":                     "4N0TP4Rmj6QQezWV88ARNJ",
+  "Can't You Hear Me Knockin":        "1hIQPCM3oWXrpnXmgTDaKG",
+};
+
+// Matchup pairs: [songA_id, songB_id, day]
+// Schedule: R64 days 1-2 (8/day), R32 days 3-4 (4/day), S16 days 5-6 (2/day),
+//           E8 days 7-8 (1/day), FF days 9-10 (1/day), Final day 11
 const PAIRS = [
-  [1,2,1,{a:142,b:58}],[17,18,1,{a:91,b:109}],[33,34,1,{a:128,b:72}],[49,50,1,{a:155,b:45}],
-  [3,4,2,{a:77,b:123}],[19,20,2,{a:115,b:85}],[35,36,2,{a:98,b:102}],[51,52,2,{a:133,b:67}],
-  [5,6,3,null],[21,22,3,null],[37,38,3,null],[53,54,3,null],
-  [7,8,4,null],[23,24,4,null],[39,40,4,null],[55,56,4,null],
-  [9,10,5,null],[25,26,5,null],[41,42,5,null],[57,58,5,null],
-  [11,12,6,null],[27,28,6,null],[43,44,6,null],[59,60,6,null],
-  [13,14,7,null],[29,30,7,null],[45,46,7,null],[61,62,7,null],
-  [15,16,8,null],[31,32,8,null],[47,48,8,null],[63,64,8,null],
+  // Day 1 — R64 first half (16 matchups, 4 per region)
+  [1,2,1],[17,18,1],[33,34,1],[49,50,1],
+  [3,4,1],[19,20,1],[35,36,1],[51,52,1],
+  [5,6,1],[21,22,1],[37,38,1],[53,54,1],
+  [7,8,1],[23,24,1],[39,40,1],[55,56,1],
+  // Day 2 — R64 second half (16 matchups, 4 per region)
+  [9,10,2],[25,26,2],[41,42,2],[57,58,2],
+  [11,12,2],[27,28,2],[43,44,2],[59,60,2],
+  [13,14,2],[29,30,2],[45,46,2],[61,62,2],
+  [15,16,2],[31,32,2],[47,48,2],[63,64,2],
+  // Day 3 — R32 first half (8 matchups, 2 per region) — added after R64 winners known
+  // Day 4 — R32 second half (8 matchups, 2 per region)
+  // Days 5-6 — S16 (4 matchups/day), Days 7-8 — E8 (2/day)
+  // Days 9-10 — Final Four (1/day), Day 11 — Final (1)
 ];
 
-const buildMatchups = () => PAIRS.map(([a,b,day,mv],i) => ({
-  id:i, song1:byId(a), song2:byId(b), day,
-  region: a<=16?"East":a<=32?"West":a<=48?"North":"South",
+const buildMatchups = () => PAIRS.map(([a,b,day],i) => ({
+  id:i+1, song1:byId(a), song2:byId(b), day,
+  region: a<=16?"Woodstock":a<=32?"Watergate":a<=48?"Haight-Ashbury":"Laurel Canyon",
   locked: day<CURRENT_DAY,
-  winner: mv?(mv.a>mv.b?"a":"b"):null,
-  votes: mv||{a:0,b:0},
+  winner: null,
+  votes: {a:0,b:0},
 }));
 
 // ── Archive data ──────────────────────────────────────────────────────────────
@@ -341,7 +459,7 @@ function BNode({song,x,y,isWinner,isLoser,isLive,isPast,isFuture,unlockDay,isSel
           {isLive&&<div className="live-dot" style={{position:"absolute",top:5,right:7,width:5,height:5,borderRadius:"50%",background:C.yellow}}/>}
         </>:<div style={{fontSize:10,color:C.gray300,fontFamily:"'Barlow Condensed',sans-serif"}}>TBD</div>}
       </div>
-      {isFuture&&hov&&unlockDay&&<div style={{position:"absolute",top:CARD_H+5,left:"50%",transform:"translateX(-50%)",background:C.black,border:`1px solid ${C.gray700}`,borderRadius:4,padding:"5px 10px",whiteSpace:"nowrap",zIndex:999,fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,textTransform:"uppercase",letterSpacing:1.5,color:C.gray300,pointerEvents:"none",display:"flex",alignItems:"center",gap:5}}><Lock size={10} color={C.gray300}/>Unlocks Day {unlockDay}</div>}
+      {isFuture&&hov&&unlockDay&&<div style={{position:"absolute",top:CARD_H+5,left:"50%",transform:"translateX(-50%)",background:C.black,border:`1px solid ${C.gray700}`,borderRadius:4,padding:"5px 10px",whiteSpace:"nowrap",zIndex:999,fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,textTransform:"uppercase",letterSpacing:1.5,color:C.gray300,pointerEvents:"none",display:"flex",alignItems:"center",gap:5}}><Lock size={10} color={C.gray300}/>{CURRENT_DAY===0?`Opens Day ${unlockDay}`:`Unlocks Day ${unlockDay}`}</div>}
       {isPast&&hov&&<div style={{position:"absolute",top:CARD_H+5,left:"50%",transform:"translateX(-50%)",background:C.black,border:`1px solid ${C.gray700}`,borderRadius:4,padding:"5px 10px",whiteSpace:"nowrap",zIndex:999,fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,textTransform:"uppercase",letterSpacing:1.5,color:C.gray300,pointerEvents:"none"}}>View Results</div>}
     </div>
   );
@@ -570,11 +688,42 @@ function ArchiveCard({title,subtitle,isWinner,isChampion,isSelected,style,onClic
 }
 
 // ── Vote card ─────────────────────────────────────────────────────────────────
+function SpotifyPreview({song}){
+  const trackId = SPOTIFY_IDS[song?.title];
+  const [open, setOpen] = useState(false);
+  if(!trackId) return null;
+  return (
+    <div style={{marginTop:6}}>
+      <button onClick={()=>setOpen(o=>!o)}
+        style={{display:"flex",alignItems:"center",gap:5,padding:"4px 10px",background:"none",
+          border:`1px solid ${C.gray200}`,borderRadius:6,cursor:"pointer",
+          color:C.gray500,fontSize:11,fontFamily:"'Barlow Condensed',sans-serif",
+          textTransform:"uppercase",letterSpacing:1,transition:"all 0.15s"}}
+        onMouseEnter={e=>{e.currentTarget.style.borderColor=C.gray400;e.currentTarget.style.color=C.black;}}
+        onMouseLeave={e=>{e.currentTarget.style.borderColor=C.gray200;e.currentTarget.style.color=C.gray500;}}>
+        {open
+          ? <><ChevronDown size={11}/>Hide Preview</>
+          : <><Play size={11}/>Preview</>}
+      </button>
+      {open&&(
+        <div style={{marginTop:8,borderRadius:8,overflow:"hidden",height:80}} className="fade-up">
+          <iframe
+            src={`https://open.spotify.com/embed/track/${trackId}?utm_source=generator&theme=0`}
+            width="100%" height="80" frameBorder="0"
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            loading="lazy" style={{display:"block"}}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
 function VoteCard({m,voted,pending,setPending,confirmVote,highlight}){
   const uv=voted[m.id],pend=pending[m.id];
   const isLive=m.day===CURRENT_DAY,canVote=isLive&&!uv&&!m.locked;
   const tot=m.votes.a+m.votes.b;
-  const showResults=!!uv||!!m.winner;
+  const showResults=(!!uv||!!m.winner)&&CURRENT_DAY>0;
   const [copied,setCopied]=useState(false);
   const cardRef=useRef(null);
 
@@ -607,7 +756,7 @@ function VoteCard({m,voted,pending,setPending,confirmVote,highlight}){
         <div style={{display:"flex",alignItems:"center",gap:8}}>
           {isLive&&<span className="live-dot" style={{display:"inline-block",width:7,height:7,borderRadius:"50%",background:C.yellow,flexShrink:0}}/>}
           <span style={{fontSize:11,fontWeight:600,textTransform:"uppercase",letterSpacing:1.5,color:isLive?C.black:C.gray500}}>
-            {isLive?"Vote Now":m.locked?`Day ${m.day} — Closed`:`Day ${m.day} — Upcoming`}
+            {isLive?"Vote Now":m.locked&&CURRENT_DAY>0?`Day ${m.day} — Closed`:m.locked?`Opens Day ${m.day}`:`Day ${m.day} — Upcoming`}
           </span>
         </div>
         <span style={{fontSize:11,color:C.gray400,fontWeight:500}}>{m.region}</span>
@@ -631,6 +780,7 @@ function VoteCard({m,voted,pending,setPending,confirmVote,highlight}){
                       {isWin&&<Crown size={13} color={C.black} style={{flexShrink:0}}/>}{song?.title}
                     </div>
                   <div style={{fontSize:12,color:C.gray500,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{song?.artist} · {song?.year}</div>
+                  <SpotifyPreview song={song}/>
                 </div>
                 {showResults&&<div style={{textAlign:"right",flexShrink:0,zIndex:1}}><div style={{fontSize:15,fontWeight:800,color:isWin?C.black:C.gray400}}>{vPct}%</div><div style={{fontSize:10,color:C.gray400}}>{votes} vote{votes!==1?"s":""}</div></div>}
                 {canVote&&chosen&&!uv&&<div style={{width:18,height:18,borderRadius:"50%",background:C.yellow,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,zIndex:1}}><Check size={11} color={C.black} strokeWidth={3}/></div>}
@@ -672,6 +822,7 @@ export default function App(){
   const [view,setView]=useState("vote");
   const [activeArchive,setActiveArchive]=useState(null);
   const [selectedMatchup,setSelectedMatchup]=useState(null);
+  const [draftSong,setDraftSong]=useState(null);
   const [highlightId,setHighlightId]=useState(()=>{
     const p=new URLSearchParams(window.location.search);
     const id=parseInt(p.get("m"));
@@ -760,10 +911,10 @@ export default function App(){
   },[]);
 
   const getWinner=m=>m.winner?(m.winner==="a"?m.song1:m.song2):null;
-  const eastMs=matchups.filter(m=>m.region==="East").sort((a,b)=>a.id-b.id);
-  const westMs=matchups.filter(m=>m.region==="West").sort((a,b)=>a.id-b.id);
-  const northMs=matchups.filter(m=>m.region==="North").sort((a,b)=>a.id-b.id);
-  const southMs=matchups.filter(m=>m.region==="South").sort((a,b)=>a.id-b.id);
+  const eastMs=matchups.filter(m=>m.region==="Woodstock").sort((a,b)=>a.id-b.id);
+  const westMs=matchups.filter(m=>m.region==="Watergate").sort((a,b)=>a.id-b.id);
+  const northMs=matchups.filter(m=>m.region==="Haight-Ashbury").sort((a,b)=>a.id-b.id);
+  const southMs=matchups.filter(m=>m.region==="Laurel Canyon").sort((a,b)=>a.id-b.id);
 
   const buildTree=r64s=>{
     const r0=r64s.map(m=>({s1:m.song1,s2:m.song2,m}));
@@ -782,9 +933,9 @@ export default function App(){
     const lcy=(r,k)=>pixelOffsetY+cardCY(r,k);
     tree.forEach((round,r)=>{
       round.forEach((slot,k)=>{
-        const isLive=slot.m&&slot.m.day===CURRENT_DAY;
-        const isPast=slot.m&&slot.m.locked;
-        const isFuture=slot.m&&!slot.m.locked&&!isLive;
+        const isLive=slot.m&&slot.m.day===CURRENT_DAY&&CURRENT_DAY>0;
+        const isPast=slot.m&&slot.m.locked&&CURRENT_DAY>0&&slot.m.day<CURRENT_DAY;
+        const isFuture=slot.m&&(!isLive&&!isPast);
         const wKey=slot.m?.winner;
         [[slot.s1,"a"],[slot.s2,"b"]].forEach(([song,side],ei)=>{
           const cy=lcy(r,k*2+ei);
@@ -822,8 +973,8 @@ export default function App(){
   const{cards:wCards,paths:wPaths}=renderRegion(westTree,rightX,0);
   const{cards:sCards,paths:sPaths}=renderRegion(southTree,rightX,REGION_H);
 
-  const todayMs=matchups.filter(m=>m.day===CURRENT_DAY);
-  const pastMs=matchups.filter(m=>m.locked).sort((a,b)=>b.day-a.day);
+  const todayMs=CURRENT_DAY===0?matchups.filter(m=>m.day===1):matchups.filter(m=>m.day===CURRENT_DAY);
+  const pastMs=CURRENT_DAY===0?[]:matchups.filter(m=>m.locked&&m.day<CURRENT_DAY).sort((a,b)=>b.day-a.day);
 
   const Header=()=>(
     <div style={{position:"fixed",top:0,left:0,right:0,zIndex:300,background:C.white,borderBottom:`2px solid ${C.black}`,padding:"0 20px",height:56,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
@@ -832,7 +983,7 @@ export default function App(){
         <div style={{fontSize:20,fontWeight:900,fontFamily:"'Bebas Neue',sans-serif",lineHeight:1,color:C.black,letterSpacing:2}}>Best of the 70s</div>
       </div>
       <nav style={{display:"flex",gap:4}}>
-        {[["vote","Vote"],["bracket","Bracket"],["archive","Archive"]].map(([v,l])=>(
+        {[["vote","Vote"],["bracket","Bracket"],["archive","Archive"],["draft","Draft"]].map(([v,l])=>(
           <button key={v} onClick={()=>setView(v)} style={{padding:"6px 14px",borderRadius:20,background:view===v?C.yellow:"transparent",border:`1.5px solid ${view===v?C.yellow:C.gray200}`,color:view===v?C.black:C.gray600,fontSize:13,fontWeight:700,fontFamily:"'Barlow Condensed',sans-serif",textTransform:"uppercase",letterSpacing:0.5,transition:"all 0.15s"}}>{l}</button>
         ))}
       </nav>
@@ -913,6 +1064,107 @@ export default function App(){
     );
   }
 
+  if(view==="draft"){
+    // Serpentine draft order: round 1 = L,C,J,P; round 2 = P,J,C,L; alternating
+    const DRAFTERS = ["Les","Casey","Joe","Peter"];
+    const DRAFTER_COLORS = {Les:C.yellow, Casey:"#3B82F6", Joe:"#10B981", Peter:"#EC4899"};
+    // True draft pick order, hardcoded
+    const byDrafter = {
+      Les:   ["Free Bird","Tumbling Dice","Let The Good Times Roll","Sweet Emotion","Born to Run","Dixie Chicken","Sweet Home Alabama","Blue Sky","Rocky Mountain Way","Fly Like an Eagle","American Girl","Taking it to The Streets","Brandy","Stayin Alive","Rock Lobster","Shining Star"],
+      Casey: ["The Chain","Margaritaville","The Boys Are Back In Town","Sir Duke","Gimme! Gimme! Gimme!","What's Going On","Fool In The Rain","Tell Me Something Good","Kodachrome","Lovely Day","My Sweet Lord","War Pigs","Scarlet Begonias","Wonderful World Beautiful People","Beast of Burden","Roxanne"],
+      Joe:   ["Dreams","Wish You Were Here","Fire And Rain","Tiny Dancer","Into the Mystic","Friend of the Devil","Can't You Hear Me Knockin","Rebel Rebel","Going to California","Rocky Mountain High","Let's Stay Together","Stay With Me","The Boxer","Angel From Montgomery","Angel","Summer Breeze"],
+      Peter: ["Bohemian Rhapsody","Stairway to Heaven","I Will Survive","You're So Vain","Band on the Run","Dance The Night Away","Bennie and the Jets","Night Moves","Jolene","Jamming","Me and Bobby McGee","The Joker","Walk on the Wild Side","Ventura Highway","Crazy On You","Superstition"],
+    };
+    // Look up full song object by title
+    const songByTitle = t => SONGS.find(s=>s.title===t);
+    const draftTable = Array.from({length:16},(_,i)=>({
+      round: i+1,
+      picks: {
+        Les:   songByTitle(byDrafter.Les[i]),
+        Casey: songByTitle(byDrafter.Casey[i]),
+        Joe:   songByTitle(byDrafter.Joe[i]),
+        Peter: songByTitle(byDrafter.Peter[i]),
+      }
+    }));
+
+    return (
+      <div style={{minHeight:"100vh",background:C.gray50}}>
+        <style>{GLOBAL_CSS}</style>
+        <Header/>
+        <div style={{maxWidth:900,margin:"0 auto",padding:"72px 16px 48px"}}>
+          <div style={{marginBottom:28}}>
+            <div style={{fontSize:11,textTransform:"uppercase",letterSpacing:3,color:C.gray500,fontFamily:"'Barlow Condensed',sans-serif",marginBottom:4}}>The Draft</div>
+            <div style={{fontSize:36,fontWeight:900,fontFamily:"'Bebas Neue',sans-serif",letterSpacing:2,color:C.black,lineHeight:1}}>Pick Order</div>
+            <div style={{width:48,height:3,background:C.yellow,marginTop:10,borderRadius:2}}/>
+          </div>
+          {/* Drafter legend */}
+          <div style={{display:"flex",gap:16,marginBottom:20,flexWrap:"wrap"}}>
+            {DRAFTERS.map(d=>(
+              <div key={d} style={{display:"flex",alignItems:"center",gap:6}}>
+                <div style={{width:10,height:10,borderRadius:2,background:DRAFTER_COLORS[d]}}/>
+                <span style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:13,fontWeight:700,textTransform:"uppercase",letterSpacing:1,color:C.black}}>{d}</span>
+              </div>
+            ))}
+          </div>
+          {/* Table */}
+          <div style={{background:C.white,borderRadius:12,border:`1px solid ${C.gray200}`,overflow:"hidden"}}>
+            {/* Header */}
+            <div style={{display:"grid",gridTemplateColumns:"48px 1fr 1fr 1fr 1fr",borderBottom:`2px solid ${C.black}`}}>
+              <div style={{padding:"10px 12px",fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,textTransform:"uppercase",letterSpacing:2,color:C.gray500}}>#</div>
+              {DRAFTERS.map(d=>(
+                <div key={d} style={{padding:"10px 12px",fontFamily:"'Bebas Neue',sans-serif",fontSize:16,letterSpacing:1,color:C.black,borderLeft:`1px solid ${C.gray100}`}}>
+                  <span style={{borderBottom:`3px solid ${DRAFTER_COLORS[d]}`,paddingBottom:2}}>{d}</span>
+                </div>
+              ))}
+            </div>
+            {/* Rows */}
+            {draftTable.map((row,ri)=>(
+              <div key={row.round} style={{display:"grid",gridTemplateColumns:"48px 1fr 1fr 1fr 1fr",borderBottom:ri<15?`1px solid ${C.gray100}`:"none",background:ri%2===0?C.white:C.gray50}}>
+                <div style={{padding:"12px",fontFamily:"'Barlow Condensed',sans-serif",fontSize:13,fontWeight:700,color:C.gray400,display:"flex",alignItems:"center"}}>{row.round}</div>
+                {DRAFTERS.map(d=>{
+                  const song=row.picks[d];
+                  const trackId=SPOTIFY_IDS[song?.title];
+                  return (
+                    <div key={d} onClick={()=>setDraftSong(s=>s?.id===song?.id?null:song)}
+                      style={{padding:"10px 12px",borderLeft:`1px solid ${C.gray100}`,cursor:"pointer",transition:"background 0.12s"}}
+                      onMouseEnter={e=>e.currentTarget.style.background=C.yellowBg}
+                      onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                      <div style={{fontSize:13,fontWeight:700,color:C.black,fontFamily:"'Barlow Condensed',sans-serif",lineHeight:1.2}}>{song?.title}</div>
+                      <div style={{fontSize:11,color:C.gray500,marginTop:2}}>{song?.artist}</div>
+                      {trackId&&<div style={{marginTop:4,display:"flex",alignItems:"center",gap:3,color:C.gray400}}><Play size={9}/><span style={{fontSize:10,fontFamily:"'Barlow Condensed',sans-serif",textTransform:"uppercase",letterSpacing:1}}>Preview</span></div>}
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* Song detail drawer */}
+        {draftSong&&(
+          <div style={{position:"fixed",bottom:0,left:0,right:0,background:C.white,borderTop:`2px solid ${C.yellow}`,padding:"16px 20px 24px",zIndex:400,boxShadow:"0 -4px 24px rgba(0,0,0,0.10)"}} className="slide-up">
+            <div style={{maxWidth:560,margin:"0 auto"}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+                <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:20,color:C.black}}>{draftSong.title}</div>
+                <button onClick={()=>setDraftSong(null)} style={{color:C.gray400,display:"flex",alignItems:"center"}}><X size={18}/></button>
+              </div>
+              <div style={{fontSize:13,color:C.gray600,marginBottom:12}}>{draftSong.artist} · {draftSong.year}</div>
+              {SPOTIFY_IDS[draftSong.title]&&(
+                <div style={{borderRadius:8,overflow:"hidden"}}>
+                  <iframe
+                    src={`https://open.spotify.com/embed/track/${SPOTIFY_IDS[draftSong.title]}?utm_source=generator&theme=0`}
+                    width="100%" height="80" frameBorder="0"
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                    loading="lazy" style={{display:"block"}}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   if(view==="bracket") return (
     <div style={{height:"100vh",overflow:"hidden",background:C.white,display:"flex",flexDirection:"column"}}>
       <style>{GLOBAL_CSS}</style>
@@ -921,7 +1173,7 @@ export default function App(){
         <div style={{borderBottom:`1px solid ${C.gray100}`,padding:"8px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",background:C.white,flexShrink:0}}>
           <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:12,textTransform:"uppercase",letterSpacing:2,color:C.gray600,display:"flex",alignItems:"center",gap:8}}>
             <span className="live-dot" style={{display:"inline-block",width:7,height:7,borderRadius:"50%",background:C.yellow}}/>
-            Round of 64 · Day {CURRENT_DAY} of 8
+            Round of 64 · Day {CURRENT_DAY} of 11
           </div>
           <div style={{display:"flex",alignItems:"center",gap:6}}>
             <button onClick={()=>adjustZoom(-0.1)} style={{width:28,height:28,background:C.gray50,border:`1px solid ${C.gray200}`,color:C.black,borderRadius:6,fontSize:16,display:"flex",alignItems:"center",justifyContent:"center"}}>−</button>
@@ -1001,9 +1253,14 @@ export default function App(){
                 </>);
               })()}
               {eCards}{nCards}{wCards}{sCards}
-              {[["East",0,0],["North",0,REGION_H],["West",1,0],["South",1,REGION_H]].map(([label,side,yo])=>(
-                <div key={label} style={{position:"absolute",[side===0?"left":"right"]:0,top:yo+10,fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,textTransform:"uppercase",letterSpacing:3,color:C.yellow,fontWeight:700}}>{label}</div>
-              ))}
+              {[["Woodstock",0,0,false],["Haight-Ashbury",0,REGION_H,true],["Watergate",1,0,false],["Laurel Canyon",1,REGION_H,true]].map(([label,side,yo,isBottom])=>{
+                // Bottom of the last R64 card: cardCY(0,15) + CARD_H/2 + 8
+                const lastCardBottom = cardCY(0,15) + CARD_H/2 + 8;
+                const topPos = isBottom ? yo + lastCardBottom : yo + 10;
+                return (
+                  <div key={label} style={{position:"absolute",[side===0?"left":"right"]:0,top:topPos,fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,textTransform:"uppercase",letterSpacing:3,color:C.yellow,fontWeight:700}}>{label}</div>
+                );
+              })}
               {["R64","R32","S16","E8"].map((l,r)=>(
                 <div key={r} style={{position:"absolute",left:leftX(r),top:26,width:CARD_W,textAlign:"center",fontFamily:"'Barlow Condensed',sans-serif",fontSize:9,color:C.gray300,textTransform:"uppercase",letterSpacing:1}}>{l}</div>
               ))}
@@ -1033,10 +1290,10 @@ export default function App(){
       <div style={{maxWidth:560,margin:"0 auto",padding:"72px 16px 48px"}}>
         <div style={{marginBottom:28}}>
           <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
-            <span className="live-dot" style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.yellow,flexShrink:0}}/>
+            {CURRENT_DAY>0&&<span className="live-dot" style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.yellow,flexShrink:0}}/>}
             <div>
-              <div style={{fontSize:11,textTransform:"uppercase",letterSpacing:2,color:C.gray500,fontFamily:"'Barlow Condensed',sans-serif"}}>Live Now</div>
-              <div style={{fontSize:22,fontWeight:900,fontFamily:"'Bebas Neue',sans-serif",letterSpacing:1,color:C.black,lineHeight:1}}>Day {CURRENT_DAY} Matchups</div>
+              <div style={{fontSize:11,textTransform:"uppercase",letterSpacing:2,color:C.gray500,fontFamily:"'Barlow Condensed',sans-serif"}}>{CURRENT_DAY===0?"Coming Thursday":"Live Now"}</div>
+              <div style={{fontSize:22,fontWeight:900,fontFamily:"'Bebas Neue',sans-serif",letterSpacing:1,color:C.black,lineHeight:1}}>{CURRENT_DAY===0?"Day 1 Matchups":`Day ${CURRENT_DAY} Matchups`}</div>
             </div>
           </div>
           {todayMs.map(m=><VoteCard key={m.id} m={m} voted={voted} pending={pending} setPending={setPending} confirmVote={confirmVote} highlight={m.id===highlightId}/>)}
