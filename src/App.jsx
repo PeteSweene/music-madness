@@ -35,6 +35,7 @@ const C = {
 
 // ── Layout constants ──────────────────────────────────────────────────────────
 const CURRENT_DAY = 0;
+const LIVE_PLAYLISTS = { spotify: "https://open.spotify.com/playlist/0qYegEWazlLhQn3tIUKVwL?si=3a9995d57ede42bb", apple: "https://music.apple.com/us/playlist/top-64-1970s/pl.u-KJVvT1M2R3W" };
 const CARD_W = 150, CARD_H = 52, ROUND_GAP_X = 44, BASE_SLOT_H = 88;
 
 // ── Global CSS ────────────────────────────────────────────────────────────────
@@ -50,8 +51,11 @@ const GLOBAL_CSS = `
   @keyframes fadeUp { from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);} }
   @keyframes pulse { 0%,100%{opacity:1;}50%{opacity:0.4;} }
   @keyframes slideUp { from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);} }
+  @keyframes popIn { 0%{opacity:0;transform:scale(0.92);}100%{opacity:1;transform:scale(1);} }
+  @keyframes shimmer { 0%{background-position:-200% 0;}100%{background-position:200% 0;} }
   .fade-up { animation: fadeUp 0.25s ease forwards; }
   .slide-up { animation: slideUp 0.3s ease forwards; }
+  .pop-in { animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1) forwards; }
   .live-dot { animation: pulse 1.6s ease infinite; }
   .drawer-transition { transition: height 0.35s cubic-bezier(0.4,0,0.2,1); }
 `;
@@ -249,26 +253,27 @@ const ARCHIVES = [
   {
     year:"2025", theme:"Best Song of 1960s", champion:"Fortunate Son", championArtist:"Creedence Clearwater Revival",
     finalist:"Come Together", finalistArtist:"The Beatles",
+    playlists:{ spotify: "https://open.spotify.com/playlist/62bFSYR6gHcrKrzuBXpD1o?si=bb9b4f474af04801", apple: "https://music.apple.com/us/playlist/top-64-1960s/pl.u-gZ1JCxVD0oj" },
     regions:[
-      { name:"Region 1", seeds:["Fortunate Son","I Got You Babe","Respect","Purple Haze","Good Lovin'","Light My Fire","Piece of My Heart","Whiter Shade of Pale","Sunshine of Your Love","These Boots Are Made for Walkin'","Brown Eyed Girl","California Dreamin'","In the Midnight Hour","My Girl","Stop! In the Name of Love","Help!"],
-        r64:[m("Fortunate Son","I Got You Babe"),m("Respect","Purple Haze"),m("Light My Fire","Good Lovin'"),m("Piece of My Heart","Whiter Shade of Pale"),m("Sunshine of Your Love","These Boots Are Made for Walkin'"),m("Brown Eyed Girl","California Dreamin'"),m("My Girl","In the Midnight Hour"),m("Stop! In the Name of Love","Help!")],
-        r32:[m("Fortunate Son","Respect"),m("Light My Fire","Piece of My Heart"),m("Brown Eyed Girl","Sunshine of Your Love"),m("My Girl","Stop! In the Name of Love")],
-        s16:[m("Fortunate Son","Light My Fire"),m("My Girl","Brown Eyed Girl")],
-        e8:[m("Fortunate Son","My Girl")],
+      { name:"Top Left",
+        r64:[m("Fortunate Son","What's New Pussy Cat?"),m("House of the Rising Sun","Carolina In My Mind"),m("The Weight","You Really Got Me"),m("Cinnamon Girl","Catch Another Butterfly"),m("In My Life","The Wind Cries Mary"),m("Brown Eyed Girl","I Second That Emotion"),m("Gimme Shelter","Folsom Prison Blues"),m("Sympathy For The Devil","Jackson")],
+        r32:[m("Fortunate Son","House of the Rising Sun"),m("The Weight","Cinnamon Girl"),m("Brown Eyed Girl","In My Life"),m("Sympathy For The Devil","Gimme Shelter")],
+        s16:[m("Fortunate Son","The Weight"),m("Brown Eyed Girl","Sympathy For The Devil")],
+        e8:[m("Fortunate Son","Brown Eyed Girl")],
       },
-      { name:"Region 2", seeds:["Ain't No Mountain High Enough","Like a Rolling Stone","Johnny B. Goode","Be My Baby","Soul Man","Paint It Black","When a Man Loves a Woman","Good Vibrations","Reach Out I'll Be There","What's Going On","Yesterday","Hey Jude","Twist and Shout","Satisfaction","Under the Boardwalk","Stand By Me"],
-        r64:[m("Ain't No Mountain High Enough","Like a Rolling Stone"),m("Johnny B. Goode","Be My Baby"),m("Soul Man","Paint It Black"),m("When a Man Loves a Woman","Good Vibrations"),m("Reach Out I'll Be There","What's Going On"),m("Hey Jude","Yesterday"),m("Twist and Shout","Satisfaction"),m("Stand By Me","Under the Boardwalk")],
-        r32:[m("Ain't No Mountain High Enough","Johnny B. Goode"),m("Soul Man","When a Man Loves a Woman"),m("Hey Jude","Reach Out I'll Be There"),m("Twist and Shout","Stand By Me")],
-        s16:[m("Ain't No Mountain High Enough","Soul Man"),m("Hey Jude","Twist and Shout")],
-        e8:[m("Ain't No Mountain High Enough","Hey Jude")],
+      { name:"Bottom Left",
+        r64:[m("Hold On I'm Comin'","Subterranean Homesick Blues"),m("(Sittin' On) The Dock of the Bay","Heard It Through The Grapevine"),m("Good Vibrations","Everybody's Got Something to Hide"),m("Ain't No Mountain High Enough","Black Bird"),m("Time Of The Season","The Twist"),m("Wouldn't It Be Nice","San Francisco"),m("Ramble On","Pale Blue Eyes"),m("Magic Carpet Ride","The Girl From Ipanema")],
+        r32:[m("(Sittin' On) The Dock of the Bay","Hold On I'm Comin'"),m("Ain't No Mountain High Enough","Good Vibrations"),m("Wouldn't It Be Nice","Time Of The Season"),m("Ramble On","Magic Carpet Ride")],
+        s16:[m("Ain't No Mountain High Enough","(Sittin' On) The Dock of the Bay"),m("Ramble On","Wouldn't It Be Nice")],
+        e8:[m("Ain't No Mountain High Enough","Ramble On")],
       },
-      { name:"Region 3", seeds:["I Want You Back","What'd I Say","Surfin' USA","The Loco-Motion","House of the Rising Sun","Do You Love Me","Louie Louie","Sherry","Baby Love","Dancing in the Street","Be My Baby","You Really Got Me","Walk Like an Egyptian","Needles and Pins","Little Red Corvette","Da Doo Ron Ron"],
-        r64:[m("I Want You Back","What'd I Say"),m("Surfin' USA","The Loco-Motion"),m("House of the Rising Sun","Do You Love Me"),m("Louie Louie","Sherry"),m("Baby Love","Dancing in the Street"),m("You Really Got Me","Be My Baby"),m("Walk Like an Egyptian","Needles and Pins"),m("Da Doo Ron Ron","Little Red Corvette")],
-        r32:[m("I Want You Back","Surfin' USA"),m("House of the Rising Sun","Louie Louie"),m("Baby Love","You Really Got Me"),m("Da Doo Ron Ron","Walk Like an Egyptian")],
-        s16:[m("I Want You Back","House of the Rising Sun"),m("Baby Love","Da Doo Ron Ron")],
-        e8:[m("I Want You Back","Baby Love")],
+      { name:"Top Right",
+        r64:[m("I Want You Back","21st Century Schizoid Man"),m("My Generation","Dance To The Music"),m("Spirit In The Sky","Son Of A Preacher Man"),m("Twist and Shout","Space Oddity"),m("All Along The Watchtower","Whole Lotta Love"),m("Mrs. Robinson","Babe I'm Gonna Leave You"),m("Sweet Caroline","Suite: Judy Blue Eyes"),m("You Make Me Feel Like A Natural Woman","Just Dropped In")],
+        r32:[m("I Want You Back","My Generation"),m("Spirit In The Sky","Twist and Shout"),m("Mrs. Robinson","All Along The Watchtower"),m("You Make Me Feel Like A Natural Woman","Sweet Caroline")],
+        s16:[m("I Want You Back","Spirit In The Sky"),m("You Make Me Feel Like A Natural Woman","Mrs. Robinson")],
+        e8:[m("I Want You Back","You Make Me Feel Like A Natural Woman")],
       },
-      { name:"Region 4", seeds:["Come Together","Do Wah Diddy Diddy","China Cat Sunflower","For What It's Worth","Girl From The North Country","Piece of My Heart","Down On The Corner","Gloria","For Once In My Life","Ain't Too Proud To Beg","Respect","Like A Rolling Stone","Bad Moon Rising","These Eyes","Homeward Bound","A Day In The Life"],
+      { name:"Bottom Right",
         r64:[m("Come Together","Do Wah Diddy Diddy"),m("For What It's Worth","China Cat Sunflower"),m("Piece of My Heart","Girl From The North Country"),m("Down On The Corner","Gloria"),m("For Once In My Life","Ain't Too Proud To Beg"),m("Respect","Like A Rolling Stone"),m("Bad Moon Rising","These Eyes"),m("Homeward Bound","A Day In The Life")],
         r32:[m("Come Together","For What It's Worth"),m("Down On The Corner","Piece of My Heart"),m("Respect","For Once In My Life"),m("Bad Moon Rising","Homeward Bound")],
         s16:[m("Come Together","Down On The Corner"),m("Respect","Bad Moon Rising")],
@@ -281,26 +286,27 @@ const ARCHIVES = [
   {
     year:"2024", theme:"Best Breakup Song", champion:"Before He Cheats", championArtist:"Carrie Underwood",
     finalist:"Someone Like You", finalistArtist:"Adele",
+    playlists:{ spotify: "https://open.spotify.com/playlist/5GSuCNKeSadyGTYjQPiaOl?si=9f4b0649d6494705", apple: "https://music.apple.com/us/playlist/top-64-breakup-songs/pl.u-jqrNcaYv1yL" },
     regions:[
-      { name:"Region 1", seeds:["Since U Been Gone","White Horse","Strangers","Jar of Hearts","Go Your Own Way","Traitor","Marvin's Room","Say My Name","Welcome To Heartbreak","Motion Sickness","You're So Vain","I Can't Make You Love Me","Give You Hell","Before He Cheats","Ain't No Sunshine","When I Was Your Man"],
+      { name:"Top Left",
         r64:[m("Since U Been Gone","White Horse"),m("Jar of Hearts","Strangers"),m("Go Your Own Way","Traitor"),m("Say My Name","Marvin's Room"),m("Motion Sickness","Welcome To Heartbreak"),m("You're So Vain","I Can't Make You Love Me"),m("Before He Cheats","Give You Hell"),m("Ain't No Sunshine","When I Was Your Man")],
         r32:[m("Since U Been Gone","Jar of Hearts"),m("Go Your Own Way","Say My Name"),m("You're So Vain","Motion Sickness"),m("Before He Cheats","Ain't No Sunshine")],
         s16:[m("Since U Been Gone","Go Your Own Way"),m("Before He Cheats","You're So Vain")],
         e8:[m("Before He Cheats","Since U Been Gone")],
       },
-      { name:"Region 2", seeds:["We Are Never Ever Getting Back Together","I","Love Yourself","Happier Than Ever","Need You Now","Bye Bye Bye","Heartless","Apologize","Falling","Somebody That I Used To Know","Lucid Dreams","F**k You","Landslide","Loud Places","I Want You Back","Hold Up"],
+      { name:"Bottom Left",
         r64:[m("We Are Never Ever Getting Back Together","I"),m("Happier Than Ever","Love Yourself"),m("Need You Now","Bye Bye Bye"),m("Apologize","Heartless"),m("Somebody That I Used To Know","Falling"),m("F**k You","Lucid Dreams"),m("Landslide","Loud Places"),m("I Want You Back","Hold Up")],
         r32:[m("We Are Never Ever Getting Back Together","Happier Than Ever"),m("Apologize","Need You Now"),m("F**k You","Somebody That I Used To Know"),m("I Want You Back","Landslide")],
         s16:[m("We Are Never Ever Getting Back Together","Apologize"),m("F**k You","I Want You Back")],
         e8:[m("F**k You","We Are Never Ever Getting Back Together")],
       },
-      { name:"Region 3", seeds:["Good 4 U","I Will Always Love You","Back To Black","Drivers License","Thank U Next","Mia and Sebastian's Theme","Dial Drunk","Goodbye Earl","Someone Like You","I Fall Apart","Don't","I Burned LA Down","Love The Way You Lie","Kill Bill","Skinny Love","Bite Me"],
-        r64:[m("Good 4 U","I Will Always Love You"),m("Back To Black","Drivers License"),m("Thank U Next","Mia and Sebastian's Theme"),m("Dial Drunk","Goodbye Earl"),m("Someone Like You","I Fall Apart"),m("Don't","I Burned LA Down"),m("Love The Way You Lie","Kill Bill"),m("Skinny Love","Bite Me")],
-        r32:[m("Good 4 U","Back To Black"),m("Dial Drunk","Thank U Next"),m("Someone Like You","Don't"),m("Love The Way You Lie","Skinny Love")],
-        s16:[m("Good 4 U","Dial Drunk"),m("Someone Like You","Love The Way You Lie")],
+      { name:"Top Right",
+        r64:[m("Good 4 U","I Will Always Love You"),m("Back To Black","Drivers License"),m("Thank U Next","Mia and Sebastian's Theme"),m("Dial Drunk","Goodbye Earl"),m("Someone Like You","I Fall Apart"),m("Don't","I Burned LA Down"),m("Kill Bill","Love The Way You Lie"),m("Skinny Love","Bite Me")],
+        r32:[m("Good 4 U","Back To Black"),m("Dial Drunk","Thank U Next"),m("Someone Like You","Don't"),m("Skinny Love","Kill Bill")],
+        s16:[m("Good 4 U","Dial Drunk"),m("Someone Like You","Skinny Love")],
         e8:[m("Someone Like You","Good 4 U")],
       },
-      { name:"Region 4", seeds:["I Will Survive","The Way Life Goes","I Miss You","Ivy","Say Something","Yesterday","Deja Vu","Glimpse Of Us","Silver Springs","Don't Start Now","All Too Well (10 Min)","So What","Mrs. Jackson","Slow Dancing In A Burning Room","Lose You To Love Me","Heartbreak Anniversary"],
+      { name:"Bottom Right",
         r64:[m("I Will Survive","The Way Life Goes"),m("I Miss You","Ivy"),m("Say Something","Yesterday"),m("Deja Vu","Glimpse Of Us"),m("Don't Start Now","Silver Springs"),m("All Too Well (10 Min)","So What"),m("Slow Dancing In A Burning Room","Mrs. Jackson"),m("Lose You To Love Me","Heartbreak Anniversary")],
         r32:[m("I Will Survive","I Miss You"),m("Say Something","Deja Vu"),m("All Too Well (10 Min)","Don't Start Now"),m("Slow Dancing In A Burning Room","Lose You To Love Me")],
         s16:[m("I Will Survive","Say Something"),m("All Too Well (10 Min)","Slow Dancing In A Burning Room")],
@@ -313,93 +319,96 @@ const ARCHIVES = [
   {
     year:"2023", theme:"Best Love Song", champion:"My Girl", championArtist:"The Temptations",
     finalist:"All Your'n", finalistArtist:"Tyler Childers",
+    playlists:{ spotify: null, apple: "https://music.apple.com/us/playlist/top-64-love-songs/pl.u-WKKVCR3rlD2" },
     regions:[
-      { name:"Region 1", seeds:["Love On The Brain","Just The Way You Are","Electric Love","I'm Yours","Wonderful Tonight","Bleeding Love","Just The Two Of Us","Let's Stay Together","All Of Me","Lover","This Will Be","Lover Lover","DJ Got Us Fallin' In Love","This Love","Marry You","Your Song"],
+      { name:"Top Left",
         r64:[m("Just The Way You Are","Love On The Brain"),m("I'm Yours","Electric Love"),m("Bleeding Love","Wonderful Tonight"),m("Just The Two Of Us","Let's Stay Together"),m("All Of Me","Lover"),m("This Will Be","Lover Lover"),m("This Love","DJ Got Us Fallin' In Love"),m("Marry You","Your Song")],
         r32:[m("I'm Yours","Just The Way You Are"),m("Just The Two Of Us","Bleeding Love"),m("All Of Me","This Will Be"),m("Marry You","This Love")],
-        s16:[m("Just The Two Of Us","I'm Yours"),m("All Of Me","Marry You")],
-        e8:[m("Just The Two Of Us","All Of Me")],
+        s16:[m("Just The Two Of Us","I'm Yours"),m("Marry You","All Of Me")],
+        e8:[m("Just The Two Of Us","Marry You")],
       },
-      { name:"Region 2", seeds:["All Your'n","The Only Exception","Head Over Boots","We Found Love","Love Song","God Speed","Same Love","Love You Like A Love Song","Your Man","I Wanna Know What Love Is","I Want You Back","Can't Help Falling In Love","Stay","Crazy Little Thing Called Love","Tennessee Whiskey","SHELUVME"],
+      { name:"Bottom Left",
         r64:[m("All Your'n","The Only Exception"),m("We Found Love","Head Over Boots"),m("God Speed","Love Song"),m("Same Love","Love You Like A Love Song"),m("I Wanna Know What Love Is","Your Man"),m("Can't Help Falling In Love","I Want You Back"),m("Crazy Little Thing Called Love","Stay"),m("Tennessee Whiskey","SHELUVME")],
         r32:[m("All Your'n","We Found Love"),m("Same Love","God Speed"),m("Can't Help Falling In Love","I Wanna Know What Love Is"),m("Tennessee Whiskey","Crazy Little Thing Called Love")],
-        s16:[m("All Your'n","Same Love"),m("Can't Help Falling In Love","Tennessee Whiskey")],
-        e8:[m("All Your'n","Can't Help Falling In Love")],
+        s16:[m("All Your'n","Same Love"),m("Tennessee Whiskey","Can't Help Falling In Love")],
+        e8:[m("All Your'n","Tennessee Whiskey")],
       },
-      { name:"Region 3", seeds:["The Way","Burning Love","If I Ain't Got You","LOVE","My Girl","Somebody Else","Leave The Door Open","You Make My Dreams","Bubbly","Mess Is Mine","Loving Is Easy","Lucky","Let's Get It On","The Night We Met","Crazy In Love","Your Body Is A Wonderland"],
-        r64:[m("The Way","Burning Love"),m("If I Ain't Got You","LOVE"),m("My Girl","Somebody Else"),m("Leave The Door Open","You Make My Dreams"),m("Mess Is Mine","Bubbly"),m("Loving Is Easy","Lucky"),m("Let's Get It On","The Night We Met"),m("Crazy In Love","Your Body Is A Wonderland")],
-        r32:[m("If I Ain't Got You","The Way"),m("My Girl","Leave The Door Open"),m("Loving Is Easy","Mess Is Mine"),m("Let's Get It On","Crazy In Love")],
+      { name:"Top Right",
+        r64:[m("The Way","Burning Love"),m("If I Ain't Got You","LOVE"),m("My Girl","Somebody Else"),m("You Make My Dreams","Leave The Door Open"),m("Bubbly","Mess Is Mine"),m("Loving Is Easy","Lucky"),m("Let's Get It On","The Night We Met"),m("Crazy In Love","Your Body Is A Wonderland")],
+        r32:[m("If I Ain't Got You","The Way"),m("My Girl","You Make My Dreams"),m("Loving Is Easy","Bubbly"),m("Let's Get It On","Crazy In Love")],
         s16:[m("My Girl","If I Ain't Got You"),m("Let's Get It On","Loving Is Easy")],
         e8:[m("My Girl","Let's Get It On")],
       },
-      { name:"Region 4", seeds:["Beyond","Drunk In Love","Brown Eyed Girl","Perfect","Die A Happy Man","I Really Like You","Love Story","She's A Lady","Somebody To Love","Never Gonna Give You Up","Hooked On A Feeling","Accidently In Love","Better Together","At Last","Ain't No Mountain High Enough","Joy Of My Life"],
-        r64:[m("Beyond","Drunk In Love"),m("Brown Eyed Girl","Perfect"),m("Die A Happy Man","I Really Like You"),m("Love Story","She's A Lady"),m("Somebody To Love","Never Gonna Give You Up"),m("Hooked On A Feeling","Accidently In Love"),m("At Last","Better Together"),m("Ain't No Mountain High Enough","Joy Of My Life")],
-        r32:[m("Brown Eyed Girl","Beyond"),m("Love Story","Die A Happy Man"),m("Somebody To Love","Hooked On A Feeling"),m("Ain't No Mountain High Enough","At Last")],
-        s16:[m("Brown Eyed Girl","Love Story"),m("Ain't No Mountain High Enough","Somebody To Love")],
+      { name:"Bottom Right",
+        r64:[m("Beyond","Drunk In Love"),m("Brown Eyed Girl","Perfect"),m("Die A Happy Man","I Really Like You"),m("Love Story","She's A Lady"),m("Somebody To Love","Never Gonna Give You Up"),m("Accidently In Love","Hooked On A Feeling"),m("At Last","Better Together"),m("Ain't No Mountain High Enough","Joy Of My Life")],
+        r32:[m("Brown Eyed Girl","Beyond"),m("Love Story","Die A Happy Man"),m("Accidently In Love","Somebody To Love"),m("Ain't No Mountain High Enough","At Last")],
+        s16:[m("Brown Eyed Girl","Love Story"),m("Ain't No Mountain High Enough","Accidently In Love")],
         e8:[m("Brown Eyed Girl","Ain't No Mountain High Enough")],
       },
     ],
-    semis:[m("Just The Two Of Us","All Your'n"),m("My Girl","Brown Eyed Girl")],
+    semis:[m("All Your'n","Just The Two Of Us"),m("My Girl","Brown Eyed Girl")],
     final: m("My Girl","All Your'n"),
   },
   {
     year:"2022", theme:"Best Summer Song", champion:"The Spins", championArtist:"Mac Miller",
     finalist:"Country Roads", finalistArtist:"John Denver",
+    playlists:{ spotify: "https://open.spotify.com/playlist/3YPge3XdjTsCq7rGKdJAjK?si=d09953e87a6b4644", apple: "https://music.apple.com/us/playlist/summer/pl.u-2x9YskBJWg7" },
     regions:[
-      { name:"Beach Bops", seeds:["I'm The One","Bare Foot Blue Jean Night","Three Little Birds","Chicken Fried","Sour Patch Kids","California Gurls","Knee Deep","Santeria","Kokomo","Summer of 69","I Like It","Soak Up The Sun","Fly","Despacito","Magic In The Hamptons","Heartache On The Dancefloor"],
-        r64:[m("I'm The One","Bare Foot Blue Jean Night"),m("Chicken Fried","Three Little Birds"),m("California Gurls","Sour Patch Kids"),m("Santeria","Knee Deep"),m("Summer of 69","Kokomo"),m("Soak Up The Sun","I Like It"),m("Fly","Despacito"),m("Magic In The Hamptons","Heartache On The Dancefloor")],
-        r32:[m("I'm The One","Chicken Fried"),m("Santeria","California Gurls"),m("Summer of 69","Soak Up The Sun"),m("Magic In The Hamptons","Fly")],
-        s16:[m("Chicken Fried","I'm The One"),m("Summer of 69","Santeria")],
-        e8:[m("Chicken Fried","Summer of 69")],
+      { name:"Beach Bops",
+        r64:[m("I'm The One","Bare Foot Blue Jean Night"),m("Chicken Fried","Three Little Birds"),m("California Gurls","Sour Patch Kids"),m("Santeria","Knee Deep"),m("Summer of 69","Kokomo"),m("I Like It","Soak Up The Sun"),m("Fly","Despacito"),m("Magic In The Hamptons","Heartache On The Dancefloor")],
+        r32:[m("Chicken Fried","I'm The One"),m("Santeria","California Gurls"),m("Summer of 69","I Like It"),m("Magic In The Hamptons","Fly")],
+        s16:[m("Chicken Fried","Santeria"),m("Magic In The Hamptons","Summer of 69")],
+        e8:[m("Chicken Fried","Magic In The Hamptons")],
       },
-      { name:"Summer Loves", seeds:["Summer","Hell n Back","Closer","Dang!","Get Lucky","Senorita","Feels","We are Young","Call Me Maybe","Come With Me","Watermelon Sugar","Jessie's Girl","Loving Is Easy","Electric Love","Sober","8teen"],
-        r64:[m("Summer","Hell n Back"),m("Closer","Dang!"),m("Get Lucky","Senorita"),m("Feels","We are Young"),m("Call Me Maybe","Come With Me"),m("Jessie's Girl","Watermelon Sugar"),m("Loving Is Easy","Electric Love"),m("Sober","8teen")],
-        r32:[m("Summer","Closer"),m("Get Lucky","Feels"),m("Jessie's Girl","Call Me Maybe"),m("Electric Love","Sober")],
-        s16:[m("Summer","Get Lucky"),m("Electric Love","Jessie's Girl")],
-        e8:[m("Electric Love","Summer")],
-      },
-      { name:"Summer Nights", seeds:["Slide","Fiona Coyne","Midnight City","Dance The Night Away","3 Nights","Heatwaves","Never Be Like You","Night Moves","Runaway","Weekend","The Spins","La La Land","All My Friends","Nights","Another Day In Paradise","Jet Black"],
+      { name:"Summer Nights",
         r64:[m("Slide","Fiona Coyne"),m("Midnight City","Dance The Night Away"),m("Heatwaves","3 Nights"),m("Never Be Like You","Night Moves"),m("Runaway","Weekend"),m("The Spins","La La Land"),m("All My Friends","Nights"),m("Another Day In Paradise","Jet Black")],
         r32:[m("Slide","Midnight City"),m("Heatwaves","Never Be Like You"),m("The Spins","Runaway"),m("All My Friends","Another Day In Paradise")],
         s16:[m("Heatwaves","Slide"),m("The Spins","All My Friends")],
         e8:[m("The Spins","Heatwaves")],
       },
-      { name:"Camp Classics", seeds:["This Life","Dirty Paws","Home","Sedona","Riptide","Burning","Country Roads","Salad Days","Hallucinogenics","Ho Hey","Wildfire","Counting Stars","Silver Lining","Butterflies","Canyon Moon","Flashed Junk Mind"],
-        r64:[m("This Life","Dirty Paws"),m("Home","Sedona"),m("Riptide","Burning"),m("Country Roads","Salad Days"),m("Ho Hey","Hallucinogenics"),m("Counting Stars","Wildfire"),m("Silver Lining","Butterflies"),m("Canyon Moon","Flashed Junk Mind")],
-        r32:[m("Home","This Life"),m("Country Roads","Riptide"),m("Ho Hey","Counting Stars"),m("Canyon Moon","Silver Lining")],
-        s16:[m("Country Roads","Home"),m("Ho Hey","Canyon Moon")],
+      { name:"Summer Loves",
+        r64:[m("Summer","Hell n Back"),m("Dang!","Closer"),m("Get Lucky","Senorita"),m("We Are Young","Feels"),m("Call Me Maybe","Come With Me"),m("Jessies Girl","Watermelon Sugar"),m("Loving Is Easy","Sober"),m("Electric Love","8teen")],
+        r32:[m("Summer","Dang!"),m("Get Lucky","We Are Young"),m("Jessies Girl","Call Me Maybe"),m("Electric Love","Loving Is Easy")],
+        s16:[m("Summer","Get Lucky"),m("Electric Love","Jessies Girl")],
+        e8:[m("Electric Love","Summer")],
+      },
+      { name:"Camp Classics",
+        r64:[m("This Life","Dirty Paws"),m("Home","Sedona"),m("Riptide","Burning"),m("Country Roads","Salad Days"),m("Ho Hey","Hallucinogenics"),m("Counting Stars","Wildfire"),m("Silver Lining","Butterflies"),m("Flashed Junk Mind","Canyon Moon")],
+        r32:[m("Home","This Life"),m("Country Roads","Riptide"),m("Ho Hey","Counting Stars"),m("Flashed Junk Mind","Silver Lining")],
+        s16:[m("Country Roads","Home"),m("Ho Hey","Flashed Junk Mind")],
         e8:[m("Country Roads","Ho Hey")],
       },
     ],
-    semis:[m("Chicken Fried","Electric Love"),m("The Spins","Country Roads")],
+    semis:[m("The Spins","Chicken Fried"),m("Country Roads","Electric Love")],
     final: m("The Spins","Country Roads"),
   },
   {
     year:"2021", theme:"Best Party Song", champion:"September", championArtist:"Earth, Wind & Fire",
     finalist:"Pursuit of Happiness (Remix)", finalistArtist:"Kid Cudi ft. MGMT",
+    playlists:{ spotify: null, apple: "https://music.apple.com/us/playlist/top-64-party-songs/pl.u-NRm3CLM1g3K" },
     regions:[
-      { name:"Classic Sing Alongs", seeds:["Hey Ya","Beat It","Mr. Brightside","Young Wild & Free","September","All The Small Things","Don't Stop Believin","Jump Around","Everybody","Colt 45","Party In The USA","Dancing Queen","Sweet Caroline","Despacito","Old Town Road","Take Me Home Country Roads"],
-        r64:[m("Hey Ya","Beat It"),m("Mr. Brightside","Young Wild & Free"),m("September","All The Small Things"),m("Don't Stop Believin","Jump Around"),m("Everybody","Colt 45"),m("Party In The USA","Dancing Queen"),m("Sweet Caroline","Despacito"),m("Old Town Road","Take Me Home Country Roads")],
-        r32:[m("Hey Ya","Mr. Brightside"),m("September","Don't Stop Believin"),m("Colt 45","Everybody"),m("Sweet Caroline","Party In The USA")],
-        s16:[m("Hey Ya","September"),m("Colt 45","Sweet Caroline")],
-        e8:[m("September","Hey Ya")],
+      { name:"Classic Sing Alongs",
+        r64:[m("Hey Ya","Beat It"),m("Mr. Brightside","Young, Wild & Free"),m("September","All The Small Things"),m("Don't Stop Believin'","Jump Around"),m("Colt 45","Everybody"),m("Party In The USA","Dancing Queen"),m("Sweet Caroline","Despacito"),m("Take Me Home Country Roads","Old Town Road")],
+        r32:[m("Hey Ya","Mr. Brightside"),m("September","Don't Stop Believin'"),m("Party In The USA","Colt 45"),m("Sweet Caroline","Take Me Home Country Roads")],
+        s16:[m("September","Hey Ya"),m("Sweet Caroline","Party In The USA")],
+        e8:[m("September","Sweet Caroline")],
       },
-      { name:"House Party Breakers", seeds:["Can't Hold Us","Trap Queen","A Milli","Humble","N****s In Paris","Low","Sicko Mode","Good Times Roll","Party Rock Anthem","Crank That","Pursuit of Happiness (Remix)","Black Skinhead","God's Plan","Levels","Mo Bamba","Bop"],
-        r64:[m("Can't Hold Us","Trap Queen"),m("Humble","A Milli"),m("Low","N****s In Paris"),m("Sicko Mode","Good Times Roll"),m("Crank That","Party Rock Anthem"),m("Pursuit of Happiness (Remix)","Black Skinhead"),m("Levels","God's Plan"),m("Mo Bamba","Bop")],
+      { name:"Popstar Anthems",
+        r64:[m("Like A G6","Problem"),m("California Girls","Don't Stop The Music"),m("I Love It","22"),m("Fergalicious","Levitating"),m("Hollaback Girl","Single Ladies"),m("Starships","Truth Hurts"),m("Timber","Call Me Maybe"),m("Tik Tok","Runaway")],
+        r32:[m("Like A G6","California Girls"),m("Fergalicious","I Love It"),m("Starships","Hollaback Girl"),m("Tik Tok","Timber")],
+        s16:[m("Like A G6","Fergalicious"),m("Starships","Tik Tok")],
+        e8:[m("Like A G6","Starships")],
+      },
+      { name:"House Party Breakers",
+        r64:[m("Can't Hold Us","Trap Queen"),m("Humble","A Milli"),m("Low","N**gas In Paris"),m("Sicko Mode","Good Times Roll"),m("Crank That","Party Rock Anthem"),m("Pursuit of Happiness (Remix)","Black Skinhead"),m("Levels","God's Plan"),m("Mo Bamba","Bop")],
         r32:[m("Can't Hold Us","Humble"),m("Low","Sicko Mode"),m("Pursuit of Happiness (Remix)","Crank That"),m("Levels","Mo Bamba")],
         s16:[m("Low","Can't Hold Us"),m("Pursuit of Happiness (Remix)","Levels")],
         e8:[m("Pursuit of Happiness (Remix)","Low")],
       },
-      { name:"Popstar Anthems", seeds:["Like A G6","Problem","Can't Stop The Music","California Girls","I Love It","22","Fergalicious","Levitating","Hollaback Girl","Single Ladies","Starships","Truth Hurts","Timber","Call Me Maybe","Tik Tok","Runaway"],
-        r64:[m("Like A G6","Problem"),m("California Girls","Can't Stop The Music"),m("I Love It","22"),m("Fergalicious","Levitating"),m("Hollaback Girl","Single Ladies"),m("Starships","Truth Hurts"),m("Timber","Call Me Maybe"),m("Tik Tok","Runaway")],
-        r32:[m("Like A G6","California Girls"),m("I Love It","Fergalicious"),m("Hollaback Girl","Starships"),m("Timber","Tik Tok")],
-        s16:[m("Like A G6","I Love It"),m("Starships","Tik Tok")],
-        e8:[m("Like A G6","Starships")],
-      },
-      { name:"Throwback Jams", seeds:["Uptown Funk","Let's Get It Started","We Found Love","In Da Club","All Star","Live Your Life","Empire State of Mind","Feel So Close","Get Lucky","Don't Trust Me","Thrift Shop","Cupid Shuffle","Baby","Stronger","Dynamite","Ignition (Remix)"],
-        r64:[m("Uptown Funk","Let's Get It Started"),m("Let's Get It Started","We Found Love"),m("All Star","In Da Club"),m("Empire State of Mind","Live Your Life"),m("Get Lucky","Don't Trust Me"),m("Thrift Shop","Cupid Shuffle"),m("Stronger","Baby"),m("Dynamite","Ignition (Remix)")],
-        r32:[m("Let's Get It Started","Uptown Funk"),m("All Star","Empire State of Mind"),m("Thrift Shop","Get Lucky"),m("Stronger","Dynamite")],
-        s16:[m("Let's Get It Started","All Star"),m("Stronger","Thrift Shop")],
+      { name:"Throwback Jams",
+        r64:[m("Let's Get It Started","Uptown Funk"),m("In Da Club","We Found Love"),m("All Star","Live Your Life"),m("Empire State Of Mind","Feel So Close"),m("Get Lucky","Don't Trust Me"),m("Thrift Shop","Cupid Shuffle"),m("Stronger","Baby"),m("Dynamite","Ignition (Remix)")],
+        r32:[m("Let's Get It Started","In Da Club"),m("Empire State Of Mind","All Star"),m("Thrift Shop","Get Lucky"),m("Stronger","Dynamite")],
+        s16:[m("Let's Get It Started","Empire State Of Mind"),m("Stronger","Thrift Shop")],
         e8:[m("Let's Get It Started","Stronger")],
       },
     ],
@@ -441,22 +450,23 @@ const A_RIGHT_E8_X=A_RIGHT_SEMI_X+A_SEMI_W;
 const aRightColX=r=>A_RIGHT_E8_X+(A_ROUNDS-1-r)*(A_CARD_W+A_COL_GAP);
 
 // ── Bracket node ──────────────────────────────────────────────────────────────
-function BNode({song,x,y,isWinner,isLoser,isLive,isPast,isFuture,unlockDay,isSelected,onClick}){
+function BNode({song,x,y,isWinner,isLoser,isLive,isPast,isFuture,unlockDay,isSelected,userPickedWrong,userPickedThis,onClick}){
   const [hov,setHov]=useState(false);
   const isClickable=isLive||isPast;
-  const bg=isWinner?C.black:isSelected?C.gray100:hov&&isClickable?C.gray50:C.white;
-  const borderColor=isSelected?C.yellow:isWinner?C.yellow:isLive&&!isLoser?`${C.yellow}88`:C.gray200;
+  const bg=isWinner?C.black:isSelected?C.gray100:userPickedThis&&isLive?C.yellowBg:hov&&isClickable?C.gray50:C.white;
+  const borderColor=isSelected?C.yellow:isWinner?C.yellow:userPickedWrong?"#EF4444":userPickedThis&&isLive?C.yellow:isLive&&!isLoser?`${C.yellow}88`:C.gray200;
   const titleColor=isWinner?C.yellow:isLoser?C.gray400:C.black;
   return (
     <div style={{position:"absolute",left:x,top:y-CARD_H/2,width:CARD_W,zIndex:hov?10:1}}>
       <div onClick={isClickable?onClick:undefined}
         onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
-        style={{width:CARD_W,height:CARD_H,background:bg,border:`1.5px solid ${borderColor}`,borderRadius:6,opacity:isLoser?0.4:isFuture?0.35:1,cursor:isClickable?"pointer":"default",transition:"all 0.12s",padding:"0 10px",display:"flex",flexDirection:"column",justifyContent:"center",overflow:"hidden",boxShadow:isSelected?`0 0 0 2px ${C.yellow}`:"none"}}>
+        style={{width:CARD_W,height:CARD_H,background:bg,border:`1.5px solid ${borderColor}`,borderRadius:6,opacity:isLoser?0.4:isFuture?0.35:1,cursor:isClickable?"pointer":"default",transition:"all 0.12s",padding:"0 10px",display:"flex",flexDirection:"column",justifyContent:"center",overflow:"hidden",boxShadow:isSelected?`0 0 0 2px ${C.yellow}`:userPickedWrong?"0 0 0 1px #EF4444":"none"}}>
         {song?<>
           <div style={{fontSize:9,color:isWinner?C.yellowDk:C.gray500,fontFamily:"'Barlow Condensed',sans-serif",textTransform:"uppercase",letterSpacing:1,lineHeight:1}}>#{song.seed} · {song.year}</div>
           <div style={{fontSize:12,fontWeight:700,color:titleColor,fontFamily:"'Barlow Condensed',sans-serif",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",lineHeight:1.2,marginTop:1}}>{song.title}</div>
           <div style={{fontSize:10,color:isWinner?C.yellowLt:C.gray500,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",lineHeight:1}}>{song.artist}</div>
           {isLive&&<div className="live-dot" style={{position:"absolute",top:5,right:7,width:5,height:5,borderRadius:"50%",background:C.yellow}}/>}
+          {userPickedThis&&isPast&&!isWinner&&<div style={{position:"absolute",top:5,right:7,fontSize:8,color:"#EF4444",fontFamily:"'Barlow Condensed',sans-serif",textTransform:"uppercase",letterSpacing:1}}>Your pick</div>}
         </>:<div style={{fontSize:10,color:C.gray300,fontFamily:"'Barlow Condensed',sans-serif"}}>TBD</div>}
       </div>
       {isFuture&&hov&&unlockDay&&<div style={{position:"absolute",top:CARD_H+5,left:"50%",transform:"translateX(-50%)",background:C.black,border:`1px solid ${C.gray700}`,borderRadius:4,padding:"5px 10px",whiteSpace:"nowrap",zIndex:999,fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,textTransform:"uppercase",letterSpacing:1.5,color:C.gray300,pointerEvents:"none",display:"flex",alignItems:"center",gap:5}}><Lock size={10} color={C.gray300}/>{CURRENT_DAY===0?`Opens Day ${unlockDay}`:`Unlocks Day ${unlockDay}`}</div>}
@@ -536,16 +546,35 @@ function ArchiveBracket({archive}){
 
   const renderRegion=(region,ri,topBandY,isRight)=>{
     const rounds=[region.r64,region.r32,region.s16,region.e8];
+
+    // Build a map of which song occupies the top slot of each matchup at each round.
+    // R64: top slot is always match.w (seed order), bottom is match.l
+    // R32+: top slot = winner of the even-indexed feeder match, bottom = winner of odd-indexed
+    // We track topSong[r][k] = the song that should appear in the top card of round r matchup k
+    const topSong = rounds.map(()=>[]);
+    rounds[0].forEach((match,k)=>{ topSong[0][k]=match.w; }); // R64: winner on top by default
+    for(let r=1;r<rounds.length;r++){
+      rounds[r].forEach((_,k)=>{
+        // top feeder is rounds[r-1][k*2], bottom feeder is rounds[r-1][k*2+1]
+        const topFeeder=rounds[r-1][k*2];
+        topSong[r][k]=topFeeder?topFeeder.w:null;
+      });
+    }
+
     rounds.forEach((matches,r)=>{
       matches.forEach((match,k)=>{
         const cy0=topBandY+aCardY(r,k*2);
         const cy1=topBandY+aCardY(r,k*2+1);
         const x=isRight?aRightColX(r):aColX(r);
 
-        pushCard(`${ri}-${r}-${k}-0`,match.w,true,  x,cy0-A_CARD_H/2,`${ri}-${r}-${k}`,match.w,match.l);
-        pushCard(`${ri}-${r}-${k}-1`,match.l,false, x,cy1-A_CARD_H/2,`${ri}-${r}-${k}`,match.w,match.l);
+        // Place winner in whichever slot their feeder came from
+        const winnerIsTop = topSong[r][k]===match.w;
+        const topTitle    = winnerIsTop ? match.w : match.l;
+        const botTitle    = winnerIsTop ? match.l : match.w;
 
-        // Always draw vertical bar connecting the two cards in this matchup
+        pushCard(`${ri}-${r}-${k}-0`,topTitle,winnerIsTop,   x,cy0-A_CARD_H/2,`${ri}-${r}-${k}`,match.w,match.l);
+        pushCard(`${ri}-${r}-${k}-1`,botTitle,!winnerIsTop,  x,cy1-A_CARD_H/2,`${ri}-${r}-${k}`,match.w,match.l);
+
         const barX=isRight?x:x+A_CARD_W;
         pushVBar(`vbar-${ri}-${r}-${k}`,barX,cy0,cy1);
 
@@ -638,6 +667,7 @@ function ArchiveBracket({archive}){
 
   return (
     <div style={{background:C.white,display:"flex",flexDirection:"column",flex:1,minHeight:0}}>
+      <PlaylistBanner playlists={archive.playlists} accent={acc.accent}/>
       <div style={{borderBottom:`1px solid ${C.gray100}`,padding:"10px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",background:C.white,flexShrink:0}}>
         <div style={{fontSize:11,textTransform:"uppercase",letterSpacing:2,color:C.gray500,fontFamily:"'Barlow Condensed',sans-serif"}}>
           Champion: <span style={{color:acc.accentDk,fontFamily:"'Bebas Neue',sans-serif",fontSize:14}}>{archive.champion}</span>
@@ -667,24 +697,473 @@ function ArchiveBracket({archive}){
   );
 }
 
+// ── Song lookup by title (for archive cards) ──────────────────────────────────
+const SONG_BY_TITLE = {};
+SONGS.forEach(s => { SONG_BY_TITLE[s.title] = s; });
+
+// Archive songs not in the live bracket — {artist, year}
+const ARCHIVE_SONGS = {
+  // ── 2025: Best Song of 1960s ──────────────────────────────────────────────
+  "Fortunate Son":                    {artist:"Creedence Clearwater Revival", year:1969},
+  "What's New Pussy Cat?":            {artist:"Tom Jones", year:1965},
+  "Carolina In My Mind":              {artist:"James Taylor", year:1968},
+  "House of the Rising Sun":          {artist:"The Animals", year:1964},
+  "The Weight":                       {artist:"The Band", year:1968},
+  "You Really Got Me":                {artist:"The Kinks", year:1964},
+  "Cinnamon Girl":                    {artist:"Neil Young", year:1969},
+  "Catch Another Butterfly":          {artist:"John Denver", year:1965},
+  "The Wind Cries Mary":              {artist:"Jimi Hendrix", year:1967},
+  "In My Life":                       {artist:"The Beatles", year:1965},
+  "Brown Eyed Girl":                  {artist:"Van Morrison", year:1967},
+  "I Second That Emotion":            {artist:"Smokey Robinson", year:1967},
+  "Gimme Shelter":                    {artist:"Rolling Stones", year:1969},
+  "Folsom Prison Blues":              {artist:"Johnny Cash", year:1968},
+  "Sympathy For The Devil":           {artist:"Rolling Stones", year:1968},
+  "Jackson":                          {artist:"Johnny Cash & June Carter", year:1967},
+  "Subterranean Homesick Blues":      {artist:"Bob Dylan", year:1965},
+  "Hold On I'm Comin'":              {artist:"Sam & Dave", year:1966},
+  "(Sittin' On) The Dock of the Bay": {artist:"Otis Redding", year:1968},
+  "Heard It Through The Grapevine":   {artist:"Marvin Gaye", year:1968},
+  "Good Vibrations":                  {artist:"The Beach Boys", year:1966},
+  "Everybody's Got Something to Hide":{artist:"The Beatles", year:1968},
+  "Black Bird":                       {artist:"The Beatles", year:1968},
+  "Ain't No Mountain High Enough":    {artist:"Marvin Gaye & Tammi Terrell", year:1967},
+  "Time Of The Season":               {artist:"The Zombies", year:1968},
+  "The Twist":                        {artist:"Chubby Checker", year:1960},
+  "Wouldn't It Be Nice":              {artist:"The Beach Boys", year:1966},
+  "San Francisco":                    {artist:"Scott McKenzie", year:1967},
+  "Pale Blue Eyes":                   {artist:"The Velvet Underground", year:1969},
+  "Ramble On":                        {artist:"Led Zeppelin", year:1969},
+  "Magic Carpet Ride":                {artist:"Steppenwolf", year:1968},
+  "The Girl From Ipanema":            {artist:"Stan Getz & João Gilberto", year:1964},
+  "I Want You Back":                  {artist:"Jackson 5", year:1969},
+  "21st Century Schizoid Man":        {artist:"King Crimson", year:1969},
+  "Dance To The Music":               {artist:"Sly & The Family Stone", year:1968},
+  "My Generation":                    {artist:"The Who", year:1965},
+  "Son Of A Preacher Man":            {artist:"Dusty Springfield", year:1968},
+  "Spirit In The Sky":                {artist:"Norman Greenbaum", year:1969},
+  "Space Oddity":                     {artist:"David Bowie", year:1969},
+  "Twist and Shout":                  {artist:"The Beatles", year:1963},
+  "All Along The Watchtower":         {artist:"Jimi Hendrix", year:1968},
+  "Whole Lotta Love":                 {artist:"Led Zeppelin", year:1969},
+  "Babe I'm Gonna Leave You":         {artist:"Led Zeppelin", year:1969},
+  "Mrs. Robinson":                    {artist:"Simon & Garfunkel", year:1968},
+  "Suite: Judy Blue Eyes":            {artist:"CSNY", year:1969},
+  "Sweet Caroline":                   {artist:"Neil Diamond", year:1969},
+  "You Make Me Feel Like A Natural Woman":{artist:"Aretha Franklin", year:1967},
+  "Just Dropped In":                  {artist:"Kenny Rogers", year:1968},
+  "Come Together":                    {artist:"The Beatles", year:1969},
+  "Do Wah Diddy Diddy":              {artist:"Manfred Mann", year:1964},
+  "China Cat Sunflower":              {artist:"Grateful Dead", year:1969},
+  "For What It's Worth":              {artist:"Buffalo Springfield", year:1967},
+  "Girl From The North Country":      {artist:"Bob Dylan", year:1963},
+  "Piece of My Heart":                {artist:"Janis Joplin", year:1968},
+  "Down On The Corner":               {artist:"CCR", year:1969},
+  "Gloria":                           {artist:"Them", year:1964},
+  "Ain't Too Proud To Beg":           {artist:"The Temptations", year:1966},
+  "For Once In My Life":              {artist:"Stevie Wonder", year:1968},
+  "Respect":                          {artist:"Aretha Franklin", year:1967},
+  "Like A Rolling Stone":             {artist:"Bob Dylan", year:1965},
+  "Bad Moon Rising":                  {artist:"CCR", year:1969},
+  "These Eyes":                       {artist:"The Guess Who", year:1969},
+  "Homeward Bound":                   {artist:"Simon & Garfunkel", year:1966},
+  "A Day In The Life":                {artist:"The Beatles", year:1967},
+
+  // ── 2024: Best Breakup Song ───────────────────────────────────────────────
+  "Since U Been Gone":                {artist:"Kelly Clarkson", year:2004},
+  "White Horse":                      {artist:"Taylor Swift", year:2008},
+  "Strangers":                        {artist:"Halsey", year:2016},
+  "Jar of Hearts":                    {artist:"Christina Perri", year:2010},
+  "Go Your Own Way":                  {artist:"Fleetwood Mac", year:1977},
+  "Traitor":                          {artist:"Olivia Rodrigo", year:2021},
+  "Marvin's Room":                    {artist:"Drake", year:2011},
+  "Say My Name":                      {artist:"Destiny's Child", year:1999},
+  "Welcome To Heartbreak":            {artist:"Kanye West", year:2008},
+  "Motion Sickness":                  {artist:"Phoebe Bridgers", year:2017},
+  "You're So Vain":                   {artist:"Carly Simon", year:1972},
+  "I Can't Make You Love Me":         {artist:"Bonnie Raitt", year:1991},
+  "Give You Hell":                    {artist:"All-American Rejects", year:2008},
+  "Before He Cheats":                 {artist:"Carrie Underwood", year:2005},
+  "Ain't No Sunshine":                {artist:"Bill Withers", year:1971},
+  "When I Was Your Man":              {artist:"Bruno Mars", year:2012},
+  "We Are Never Ever Getting Back Together":{artist:"Taylor Swift", year:2012},
+  "I":                                {artist:"Kendrick Lamar", year:2014},
+  "Love Yourself":                    {artist:"Justin Bieber", year:2015},
+  "Happier Than Ever":                {artist:"Billie Eilish", year:2021},
+  "Need You Now":                     {artist:"Lady Antebellum", year:2009},
+  "Bye Bye Bye":                      {artist:"NSYNC", year:2000},
+  "Heartless":                        {artist:"Kanye West", year:2008},
+  "Apologize":                        {artist:"Timbaland ft. OneRepublic", year:2007},
+  "Falling":                          {artist:"Harry Styles", year:2019},
+  "Somebody That I Used To Know":     {artist:"Gotye", year:2011},
+  "Lucid Dreams":                     {artist:"Juice WRLD", year:2018},
+  "F**k You":                         {artist:"Cee Lo Green", year:2010},
+  "Landslide":                        {artist:"Fleetwood Mac", year:1975},
+  "Loud Places":                      {artist:"Jamie xx", year:2015},
+  "Hold Up":                          {artist:"Beyoncé", year:2016},
+  "Good 4 U":                         {artist:"Olivia Rodrigo", year:2021},
+  "I Will Always Love You":           {artist:"Whitney Houston", year:1992},
+  "Back To Black":                    {artist:"Amy Winehouse", year:2006},
+  "Drivers License":                  {artist:"Olivia Rodrigo", year:2021},
+  "Thank U Next":                     {artist:"Ariana Grande", year:2018},
+  "Mia and Sebastian's Theme":        {artist:"Justin Hurwitz", year:2016},
+  "Dial Drunk":                       {artist:"Noah Kahan", year:2022},
+  "Goodbye Earl":                     {artist:"Dixie Chicks", year:1999},
+  "Someone Like You":                 {artist:"Adele", year:2011},
+  "I Fall Apart":                     {artist:"Post Malone", year:2016},
+  "Don't":                            {artist:"Ed Sheeran", year:2014},
+  "I Burned LA Down":                 {artist:"Noah Cyrus", year:2020},
+  "Love The Way You Lie":             {artist:"Eminem ft. Rihanna", year:2010},
+  "Kill Bill":                        {artist:"SZA", year:2022},
+  "Skinny Love":                      {artist:"Bon Iver", year:2008},
+  "Bite Me":                          {artist:"Avril Lavigne", year:2021},
+  "I Will Survive":                   {artist:"Gloria Gaynor", year:1978},
+  "The Way Life Goes":                {artist:"Lil Uzi Vert", year:2017},
+  "I Miss You":                       {artist:"Blink-182", year:2003},
+  "Ivy":                              {artist:"Frank Ocean", year:2016},
+  "Say Something":                    {artist:"A Great Big World", year:2013},
+  "Yesterday":                        {artist:"The Beatles", year:1965},
+  "Deja Vu":                          {artist:"Olivia Rodrigo", year:2021},
+  "Glimpse Of Us":                    {artist:"Joji", year:2022},
+  "Silver Springs":                   {artist:"Fleetwood Mac", year:1976},
+  "Don't Start Now":                  {artist:"Dua Lipa", year:2019},
+  "All Too Well (10 Min)":            {artist:"Taylor Swift", year:2021},
+  "So What":                          {artist:"P!nk", year:2008},
+  "Mrs. Jackson":                     {artist:"OutKast", year:2000},
+  "Slow Dancing In A Burning Room":   {artist:"John Mayer", year:2006},
+  "Lose You To Love Me":              {artist:"Selena Gomez", year:2019},
+  "Heartbreak Anniversary":           {artist:"Giveon", year:2020},
+
+  // ── 2023: Best Love Song ──────────────────────────────────────────────────
+  "Love On The Brain":                {artist:"Rihanna", year:2016},
+  "Just The Way You Are":             {artist:"Bruno Mars", year:2010},
+  "Electric Love":                    {artist:"BØRNS", year:2014},
+  "I'm Yours":                        {artist:"Jason Mraz", year:2008},
+  "Wonderful Tonight":                {artist:"Eric Clapton", year:1977},
+  "Bleeding Love":                    {artist:"Leona Lewis", year:2007},
+  "Just The Two Of Us":               {artist:"Grover Washington Jr.", year:1981},
+  "All Of Me":                        {artist:"John Legend", year:2013},
+  "Lover":                            {artist:"Taylor Swift", year:2019},
+  "This Will Be":                     {artist:"Natalie Cole", year:1975},
+  "Lover Lover":                      {artist:"Jerrod Niemann", year:2010},
+  "DJ Got Us Fallin' In Love":        {artist:"Usher", year:2010},
+  "This Love":                        {artist:"Maroon 5", year:2004},
+  "Marry You":                        {artist:"Bruno Mars", year:2010},
+  "Your Song":                        {artist:"Elton John", year:1970},
+  "All Your'n":                       {artist:"Tyler Childers", year:2022},
+  "The Only Exception":               {artist:"Paramore", year:2009},
+  "Head Over Boots":                  {artist:"Jon Pardi", year:2016},
+  "We Found Love":                    {artist:"Rihanna", year:2011},
+  "Love Song":                        {artist:"Sara Bareilles", year:2007},
+  "God Speed":                        {artist:"Frank Ocean", year:2012},
+  "Same Love":                        {artist:"Macklemore & Ryan Lewis", year:2012},
+  "Love You Like A Love Song":        {artist:"Selena Gomez", year:2011},
+  "Your Man":                         {artist:"Josh Turner", year:2006},
+  "I Wanna Know What Love Is":        {artist:"Foreigner", year:1984},
+  "Can't Help Falling In Love":       {artist:"Elvis Presley", year:1961},
+  "Stay":                             {artist:"Rihanna ft. Mikky Ekko", year:2012},
+  "Crazy Little Thing Called Love":   {artist:"Queen", year:1979},
+  "Tennessee Whiskey":                {artist:"Chris Stapleton", year:2015},
+  "SHELUVME":                         {artist:"Tai Verdes", year:2021},
+  "The Way":                          {artist:"Ariana Grande", year:2013},
+  "Burning Love":                     {artist:"Elvis Presley", year:1972},
+  "If I Ain't Got You":               {artist:"Alicia Keys", year:2003},
+  "LOVE":                             {artist:"Kendrick Lamar", year:2017},
+  "My Girl":                          {artist:"The Temptations", year:1964},
+  "Somebody Else":                    {artist:"The 1975", year:2016},
+  "Leave The Door Open":              {artist:"Bruno Mars", year:2021},
+  "You Make My Dreams":               {artist:"Hall & Oates", year:1980},
+  "Mess Is Mine":                     {artist:"Vance Joy", year:2013},
+  "Bubbly":                           {artist:"Colbie Caillat", year:2007},
+  "Loving Is Easy":                   {artist:"Rex Orange County", year:2017},
+  "Lucky":                            {artist:"Jason Mraz & Colbie Caillat", year:2009},
+  "Let's Get It On":                  {artist:"Marvin Gaye", year:1973},
+  "The Night We Met":                 {artist:"Lord Huron", year:2015},
+  "Crazy In Love":                    {artist:"Beyoncé", year:2003},
+  "Your Body Is A Wonderland":        {artist:"John Mayer", year:2001},
+  "Beyond":                           {artist:"Leon Bridges", year:2015},
+  "Drunk In Love":                    {artist:"Beyoncé", year:2013},
+  "Perfect":                          {artist:"Ed Sheeran", year:2017},
+  "Die A Happy Man":                  {artist:"Thomas Rhett", year:2015},
+  "I Really Like You":                {artist:"Carly Rae Jepsen", year:2015},
+  "Love Story":                       {artist:"Taylor Swift", year:2008},
+  "She's A Lady":                     {artist:"Tom Jones", year:1971},
+  "Never Gonna Give You Up":          {artist:"Rick Astley", year:1987},
+  "Somebody To Love":                 {artist:"Queen", year:1976},
+  "Hooked On A Feeling":              {artist:"Blue Swede", year:1974},
+  "Accidently In Love":               {artist:"Counting Crows", year:2004},
+  "Better Together":                  {artist:"Jack Johnson", year:2005},
+  "At Last":                          {artist:"Etta James", year:1961},
+  "Joy Of My Life":                   {artist:"Chris Stapleton", year:2017},
+
+  // ── 2022: Best Summer Song ────────────────────────────────────────────────
+  "I'm The One":                      {artist:"DJ Khaled ft. Drake", year:2017},
+  "Bare Foot Blue Jean Night":        {artist:"Jake Owen", year:2011},
+  "Three Little Birds":               {artist:"Bob Marley", year:1977},
+  "Chicken Fried":                    {artist:"Zac Brown Band", year:2008},
+  "Sour Patch Kids":                  {artist:"Bryce Vine", year:2018},
+  "California Gurls":                 {artist:"Katy Perry", year:2010},
+  "Knee Deep":                        {artist:"Zac Brown Band", year:2010},
+  "Santeria":                         {artist:"Sublime", year:1996},
+  "Kokomo":                           {artist:"The Beach Boys", year:1988},
+  "Summer of 69":                     {artist:"Bryan Adams", year:1985},
+  "I Like It":                        {artist:"Cardi B", year:2018},
+  "Soak Up The Sun":                  {artist:"Sheryl Crow", year:2002},
+  "Fly":                              {artist:"Sugar Ray", year:1997},
+  "Despacito":                        {artist:"Luis Fonsi", year:2017},
+  "Magic In The Hamptons":            {artist:"Social House", year:2019},
+  "Heartache On The Dancefloor":      {artist:"Jon Pardi", year:2019},
+  "Slide":                            {artist:"Calvin Harris", year:2017},
+  "Fiona Coyne":                      {artist:"Skyler Spence", year:2014},
+  "Midnight City":                    {artist:"M83", year:2011},
+  "Dance The Night Away":             {artist:"Van Halen", year:1979},
+  "3 Nights":                         {artist:"Dominic Fike", year:2018},
+  "Heatwaves":                        {artist:"Glass Animals", year:2020},
+  "Never Be Like You":                {artist:"Flume", year:2016},
+  "Night Moves":                      {artist:"Bob Seger", year:1976},
+  "Runaway":                          {artist:"Galantis", year:2014},
+  "Weekend":                          {artist:"Mac Miller", year:2016},
+  "The Spins":                        {artist:"Mac Miller", year:2010},
+  "La La Land":                       {artist:"Bryce Vine", year:2018},
+  "All My Friends":                   {artist:"LCD Soundsystem", year:2007},
+  "Nights":                           {artist:"Frank Ocean", year:2016},
+  "Another Day In Paradise":          {artist:"Phil Collins", year:1989},
+  "Jet Black":                        {artist:"Anderson .Paak", year:2016},
+  "Summer":                           {artist:"Calvin Harris", year:2014},
+  "Hell n Back":                      {artist:"Bakar", year:2019},
+  "Closer":                           {artist:"The Chainsmokers", year:2016},
+  "Dang!":                            {artist:"Mac Miller", year:2016},
+  "Get Lucky":                        {artist:"Daft Punk", year:2013},
+  "Senorita":                         {artist:"Shawn Mendes & Camila Cabello", year:2019},
+  "Feels":                            {artist:"Calvin Harris", year:2017},
+  "We Are Young":                     {artist:"fun.", year:2011},
+  "Call Me Maybe":                    {artist:"Carly Rae Jepsen", year:2012},
+  "Come With Me":                     {artist:"Surfaces", year:2019},
+  "Watermelon Sugar":                 {artist:"Harry Styles", year:2019},
+  "Jessies Girl":                     {artist:"Rick Springfield", year:1981},
+  "Sober":                            {artist:"Childish Gambino", year:2014},
+  "8teen":                            {artist:"Khalid", year:2017},
+  "This Life":                        {artist:"Vampire Weekend", year:2019},
+  "Dirty Paws":                       {artist:"Of Monsters and Men", year:2011},
+  "Home":                             {artist:"Edward Sharpe & The Magnetic Zeros", year:2009},
+  "Sedona":                           {artist:"Hozier", year:2014},
+  "Riptide":                          {artist:"Vance Joy", year:2013},
+  "Burning":                          {artist:"The War on Drugs", year:2014},
+  "Country Roads":                    {artist:"John Denver", year:1971},
+  "Salad Days":                       {artist:"Mac DeMarco", year:2014},
+  "Hallucinogenics":                  {artist:"Matt Maeson", year:2019},
+  "Ho Hey":                           {artist:"The Lumineers", year:2012},
+  "Wildfire":                         {artist:"John Mayer", year:2017},
+  "Counting Stars":                   {artist:"OneRepublic", year:2013},
+  "Silver Lining":                    {artist:"Mt. Joy", year:2017},
+  "Butterflies":                      {artist:"Kacey Musgraves", year:2018},
+  "Canyon Moon":                      {artist:"Harry Styles", year:2019},
+  "Flashed Junk Mind":                {artist:"Milky Chance", year:2013},
+
+  // ── 2021: Best Party Song ─────────────────────────────────────────────────
+  "Hey Ya":                           {artist:"OutKast", year:2003},
+  "Beat It":                          {artist:"Michael Jackson", year:1982},
+  "Mr. Brightside":                   {artist:"The Killers", year:2003},
+  "Young, Wild & Free":               {artist:"Snoop Dogg & Wiz Khalifa", year:2011},
+  "September":                        {artist:"Earth, Wind & Fire", year:1978},
+  "All The Small Things":             {artist:"Blink-182", year:1999},
+  "Don't Stop Believin'":             {artist:"Journey", year:1981},
+  "Jump Around":                      {artist:"House of Pain", year:1992},
+  "Everybody":                        {artist:"Backstreet Boys", year:1999},
+  "Colt 45":                          {artist:"Afroman", year:2001},
+  "Party In The USA":                 {artist:"Miley Cyrus", year:2009},
+  "Dancing Queen":                    {artist:"ABBA", year:1976},
+  "Despacito":                        {artist:"Luis Fonsi", year:2017},
+  "Old Town Road":                    {artist:"Lil Nas X", year:2019},
+  "Take Me Home Country Roads":       {artist:"John Denver", year:1971},
+  "Like A G6":                        {artist:"Far East Movement", year:2010},
+  "Problem":                          {artist:"Ariana Grande", year:2014},
+  "Don't Stop The Music":             {artist:"Rihanna", year:2007},
+  "California Girls":                 {artist:"Katy Perry", year:2010},
+  "I Love It":                        {artist:"Icona Pop", year:2012},
+  "22":                               {artist:"Taylor Swift", year:2012},
+  "Fergalicious":                     {artist:"Fergie", year:2006},
+  "Levitating":                       {artist:"Dua Lipa", year:2020},
+  "Hollaback Girl":                   {artist:"Gwen Stefani", year:2004},
+  "Single Ladies":                    {artist:"Beyoncé", year:2008},
+  "Starships":                        {artist:"Nicki Minaj", year:2012},
+  "Truth Hurts":                      {artist:"Lizzo", year:2017},
+  "Timber":                           {artist:"Pitbull ft. Kesha", year:2013},
+  "Tik Tok":                          {artist:"Kesha", year:2009},
+  "Can't Hold Us":                    {artist:"Macklemore & Ryan Lewis", year:2011},
+  "Trap Queen":                       {artist:"Fetty Wap", year:2014},
+  "A Milli":                          {artist:"Lil Wayne", year:2008},
+  "Humble":                           {artist:"Kendrick Lamar", year:2017},
+  "N**gas In Paris":                  {artist:"Jay-Z & Kanye West", year:2011},
+  "Low":                              {artist:"Flo Rida", year:2007},
+  "Sicko Mode":                       {artist:"Travis Scott", year:2018},
+  "Good Times Roll":                  {artist:"GRiZ", year:2014},
+  "Party Rock Anthem":                {artist:"LMFAO", year:2011},
+  "Crank That":                       {artist:"Soulja Boy", year:2007},
+  "Pursuit of Happiness (Remix)":     {artist:"Kid Cudi ft. MGMT", year:2009},
+  "Black Skinhead":                   {artist:"Kanye West", year:2013},
+  "God's Plan":                       {artist:"Drake", year:2018},
+  "Levels":                           {artist:"Avicii", year:2011},
+  "Mo Bamba":                         {artist:"Sheck Wes", year:2018},
+  "Bop":                              {artist:"DaBaby", year:2019},
+  "Uptown Funk":                      {artist:"Mark Ronson ft. Bruno Mars", year:2014},
+  "Let's Get It Started":             {artist:"Black Eyed Peas", year:2004},
+  "In Da Club":                       {artist:"50 Cent", year:2003},
+  "All Star":                         {artist:"Smash Mouth", year:1999},
+  "Live Your Life":                   {artist:"T.I. ft. Rihanna", year:2008},
+  "Empire State Of Mind":             {artist:"Jay-Z ft. Alicia Keys", year:2009},
+  "Feel So Close":                    {artist:"Calvin Harris", year:2011},
+  "Don't Trust Me":                   {artist:"3OH!3", year:2008},
+  "Thrift Shop":                      {artist:"Macklemore & Ryan Lewis", year:2012},
+  "Cupid Shuffle":                    {artist:"Cupid", year:2007},
+  "Baby":                             {artist:"Justin Bieber", year:2010},
+  "Stronger":                         {artist:"Kanye West", year:2007},
+  "Dynamite":                         {artist:"Taio Cruz", year:2010},
+  "Ignition (Remix)":                 {artist:"R. Kelly", year:2003},
+};
+// Merge archive songs into main lookup
+Object.entries(ARCHIVE_SONGS).forEach(([title, data]) => {
+  if(!SONG_BY_TITLE[title]) SONG_BY_TITLE[title] = data;
+});
+
+// ── Playlist banner ───────────────────────────────────────────────────────────
+function PlaylistBanner({playlists, accent}){
+  if(!playlists?.spotify && !playlists?.apple) return null;
+  const col = accent || C.black;
+  return (
+    <div style={{padding:"8px 20px",background:C.white,borderBottom:`1px solid ${C.gray100}`,display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
+      <span style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,textTransform:"uppercase",letterSpacing:2,color:C.gray500,marginRight:4}}>Listen on</span>
+      {playlists.spotify&&(
+        <a href={playlists.spotify} target="_blank" rel="noopener noreferrer"
+          style={{display:"flex",alignItems:"center",gap:6,padding:"5px 12px",background:C.black,borderRadius:20,textDecoration:"none",transition:"opacity 0.15s"}}
+          onMouseEnter={e=>e.currentTarget.style.opacity="0.75"}
+          onMouseLeave={e=>e.currentTarget.style.opacity="1"}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#1DB954"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+          <span style={{color:C.white,fontSize:12,fontWeight:700,fontFamily:"'Barlow Condensed',sans-serif",letterSpacing:1,textTransform:"uppercase"}}>Spotify</span>
+        </a>
+      )}
+      {playlists.apple&&(
+        <a href={playlists.apple} target="_blank" rel="noopener noreferrer"
+          style={{display:"flex",alignItems:"center",gap:6,padding:"5px 12px",background:C.black,borderRadius:20,textDecoration:"none",transition:"opacity 0.15s"}}
+          onMouseEnter={e=>e.currentTarget.style.opacity="0.75"}
+          onMouseLeave={e=>e.currentTarget.style.opacity="1"}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M9 18V5l12-2v13M9 18c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-2c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          <span style={{color:C.white,fontSize:12,fontWeight:700,fontFamily:"'Barlow Condensed',sans-serif",letterSpacing:1,textTransform:"uppercase"}}>Apple Music</span>
+        </a>
+      )}
+    </div>
+  );
+}
+
 // ── Archive card (light theme) ────────────────────────────────────────────────
 function ArchiveCard({title,subtitle,isWinner,isChampion,isSelected,style,onClick,accent,accentBg,accentDk}){
   const [hov,setHov]=useState(false);
   const borderColor=isSelected||isChampion?accent:isWinner?`${accent}88`:hov?`${accent}55`:C.gray200;
   const bg=isChampion?accentBg:isWinner?C.white:C.gray50;
+  const songData=SONG_BY_TITLE[title];
   return (
     <div onClick={onClick} onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
       style={{...style,background:bg,border:`1.5px solid ${borderColor}`,borderRadius:6,
         opacity:isWinner||isChampion?1:0.4,cursor:"pointer",transition:"border-color 0.12s,opacity 0.15s",
-        padding:"0 10px",display:"flex",flexDirection:"column",justifyContent:"center",
+        padding:"0 8px",display:"flex",flexDirection:"column",justifyContent:"center",
         overflow:"hidden",boxSizing:"border-box",
         boxShadow:isChampion?`0 2px 12px ${accent}33`:"none"}}>
+      {songData&&<div style={{fontSize:9,color:isWinner?accent:C.gray400,fontFamily:"'Barlow Condensed',sans-serif",textTransform:"uppercase",letterSpacing:1,lineHeight:1,marginBottom:1}}>{songData.year}</div>}
       <div style={{fontSize:11,fontWeight:700,color:isWinner?C.black:C.gray400,fontFamily:"'Barlow Condensed',sans-serif",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",lineHeight:1.2}}>
         {isWinner&&<Crown size={11} color={accent} style={{marginRight:4,flexShrink:0,display:"inline-block",verticalAlign:"middle"}}/>}{title}
       </div>
-      {subtitle&&<div style={{fontSize:9,color:C.gray500,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",marginTop:2}}>{subtitle}</div>}
+      {songData&&<div style={{fontSize:9,color:isWinner?C.gray500:C.gray400,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",marginTop:1}}>{songData.artist}</div>}
     </div>
   );
+}
+
+// ── Welcome popup ─────────────────────────────────────────────────────────────
+function WelcomePopup({onClose}){
+  return (
+    <div style={{position:"fixed",inset:0,zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:"20px"}}
+      onClick={onClose}>
+      <div style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.6)",backdropFilter:"blur(4px)"}}/>
+      <div className="pop-in" onClick={e=>e.stopPropagation()}
+        style={{position:"relative",background:C.white,borderRadius:16,padding:"32px 28px",maxWidth:440,width:"100%",boxShadow:"0 24px 80px rgba(0,0,0,0.3)",maxHeight:"90vh",overflowY:"auto"}}>
+        <div style={{width:48,height:4,background:C.yellow,borderRadius:2,marginBottom:24}}/>
+        <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:28,letterSpacing:2,color:C.black,lineHeight:1,marginBottom:6}}>Welcome to 64 Jams</div>
+        <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:13,textTransform:"uppercase",letterSpacing:3,color:C.gray500,marginBottom:24}}>Best of the 70s · 2026</div>
+
+        <div style={{fontSize:15,color:C.gray700,lineHeight:1.7,marginBottom:14}}>
+          Every year I take my love of March Madness and music and mash them together. Created in 2021 to settle the debate over the best party song, this has become an annual tradition built around discussing, arguing, and remembering some great jams.
+        </div>
+        <div style={{fontSize:15,color:C.gray700,lineHeight:1.7,marginBottom:14}}>
+          This year's 64 songs were selected by my brothers Casey and Joe, my father Les, and myself. Any grievances with the list can be directed to Les — that's how genetics work.
+        </div>
+        <div style={{fontSize:15,color:C.gray700,lineHeight:1.7,marginBottom:14}}>
+          Voting runs for 11 days — maybe more, I'm headed into the woods this weekend — so stick around and cast your votes. Share this with your friends, your family, your enemies, anyone with quality enough taste to participate in this democracy. Once a winner is crowned, that's it. No arguing, no complaining. That's how we got stuck with September for Best Party Song in 2021.
+        </div>
+        <div style={{fontSize:15,color:C.gray700,lineHeight:1.7,marginBottom:28}}>
+          Thanks for stopping by. Have fun and be good to one another.
+        </div>
+
+        <button onClick={onClose}
+          style={{width:"100%",padding:"14px",background:C.yellow,border:"none",borderRadius:10,color:C.black,fontWeight:800,fontSize:15,fontFamily:"'Barlow Condensed',sans-serif",textTransform:"uppercase",letterSpacing:2,cursor:"pointer"}}>
+          Let's Go →
+        </button>
+        <div style={{textAlign:"center",marginTop:12}}>
+          <button onClick={onClose} style={{background:"none",border:"none",fontSize:12,color:C.gray400,cursor:"pointer",fontFamily:"'Barlow Condensed',sans-serif",letterSpacing:1}}>
+            Don't show this again
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Confetti burst ────────────────────────────────────────────────────────────
+function ConfettiBurst({onDone}){
+  const canvasRef=useRef(null);
+  useEffect(()=>{
+    const canvas=canvasRef.current;
+    if(!canvas)return;
+    const ctx=canvas.getContext("2d");
+    canvas.width=window.innerWidth;
+    canvas.height=window.innerHeight;
+    const colors=[C.yellow,C.black,"#FFFFFF","#B8A407","#F0DC3A"];
+    const particles=Array.from({length:120},()=>({
+      x:Math.random()*canvas.width,
+      y:canvas.height*0.4+Math.random()*canvas.height*0.2,
+      r:Math.random()*6+2,
+      color:colors[Math.floor(Math.random()*colors.length)],
+      vx:(Math.random()-0.5)*12,
+      vy:-(Math.random()*18+8),
+      gravity:0.5,
+      alpha:1,
+      rotation:Math.random()*360,
+      rotSpeed:(Math.random()-0.5)*8,
+      shape:Math.random()>0.5?"rect":"circle",
+    }));
+    let frame=0;
+    const animate=()=>{
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      particles.forEach(p=>{
+        p.vy+=p.gravity;
+        p.x+=p.vx;
+        p.y+=p.vy;
+        p.alpha=Math.max(0,p.alpha-0.015);
+        p.rotation+=p.rotSpeed;
+        ctx.save();
+        ctx.globalAlpha=p.alpha;
+        ctx.fillStyle=p.color;
+        ctx.translate(p.x,p.y);
+        ctx.rotate(p.rotation*Math.PI/180);
+        if(p.shape==="rect"){ctx.fillRect(-p.r,-p.r/2,p.r*2,p.r);}
+        else{ctx.beginPath();ctx.arc(0,0,p.r,0,Math.PI*2);ctx.fill();}
+        ctx.restore();
+      });
+      frame++;
+      if(frame<120)requestAnimationFrame(animate);
+      else onDone();
+    };
+    animate();
+  },[]);
+  return <canvas ref={canvasRef} style={{position:"fixed",inset:0,zIndex:500,pointerEvents:"none"}}/>;
 }
 
 // ── Vote card ─────────────────────────────────────────────────────────────────
@@ -823,6 +1302,9 @@ export default function App(){
   const [activeArchive,setActiveArchive]=useState(null);
   const [selectedMatchup,setSelectedMatchup]=useState(null);
   const [draftSong,setDraftSong]=useState(null);
+  const [showConfetti,setShowConfetti]=useState(false);
+  const [showWelcome,setShowWelcome]=useState(()=>!localStorage.getItem("mm_welcomed"));
+  const [daySharCopied,setDayShareCopied]=useState(false);
   const [highlightId,setHighlightId]=useState(()=>{
     const p=new URLSearchParams(window.location.search);
     const id=parseInt(p.get("m"));
@@ -879,11 +1361,16 @@ export default function App(){
   const confirmVote=async mid=>{
     const c=pending[mid];if(!c)return;
     setMatchups(p=>p.map(m=>m.id!==mid?m:{...m,votes:{...m.votes,[c]:m.votes[c]+1}}));
-    setVoted(p=>({...p,[mid]:c}));
+    const newVoted={...voted,[mid]:c};
+    setVoted(newVoted);
     setPending(p=>{const n={...p};delete n[mid];return n;});
     const{error}=await supabase.from("votes").insert({matchup_id:mid,voter_token:VOTER_TOKEN,choice:c});
     if(error){if(error.code!=="23505")console.error("Vote error:",error.message);}
     else await supabase.rpc("increment_vote",{p_matchup_id:mid,p_choice:c});
+    // Check if all today's matchups are now voted
+    const todayIds=matchups.filter(m=>m.day===CURRENT_DAY).map(m=>m.id);
+    const allDone=todayIds.every(id=>id===mid||newVoted[id]);
+    if(allDone&&todayIds.length>0) setTimeout(()=>setShowConfetti(true),400);
   };
 
   useEffect(()=>{
@@ -942,7 +1429,11 @@ export default function App(){
           const x=getX(r);
           const isWin=wKey===side,isLose=wKey&&wKey!==side;
           const isSel=selectedMatchup?.id===slot.m?.id;
-          cards.push(<BNode key={`${r}-${k}-${ei}-${pixelOffsetY}`} song={song} x={x} y={cy} isWinner={isWin} isLoser={isLose} isLive={isLive} isPast={isPast} isFuture={isFuture} unlockDay={slot.m?.day} isSelected={isSel} onClick={()=>{if(isLive||isPast)setSelectedMatchup(slot.m);}}/>);
+          // Highlight if user voted for this song but it lost
+          const userVote=slot.m?voted[slot.m.id]:null;
+          const userPickedThis=userVote===side;
+          const userPickedWrong=userPickedThis&&isLose;
+          cards.push(<BNode key={`${r}-${k}-${ei}-${pixelOffsetY}`} song={song} x={x} y={cy} isWinner={isWin} isLoser={isLose} isLive={isLive} isPast={isPast} isFuture={isFuture} unlockDay={slot.m?.day} isSelected={isSel} userPickedWrong={userPickedWrong} userPickedThis={userPickedThis} onClick={()=>{if(isLive||isPast)setSelectedMatchup(slot.m);}}/>);
         });
         // Draw bracket connector after placing both cards
         if(r<tree.length-1){
@@ -975,6 +1466,26 @@ export default function App(){
 
   const todayMs=CURRENT_DAY===0?matchups.filter(m=>m.day===1):matchups.filter(m=>m.day===CURRENT_DAY);
   const pastMs=CURRENT_DAY===0?[]:matchups.filter(m=>m.locked&&m.day<CURRENT_DAY).sort((a,b)=>b.day-a.day);
+  const todayVoted=todayMs.filter(m=>voted[m.id]);
+  const allTodayVoted=todayMs.length>0&&todayVoted.length===todayMs.length&&CURRENT_DAY>0;
+
+  const handleDayShare=()=>{
+    const picks=todayMs.map(m=>{
+      const choice=voted[m.id];
+      const song=choice==="a"?m.song1:m.song2;
+      return song?.title;
+    }).filter(Boolean);
+    const url=window.location.origin;
+    const text=`My Day ${CURRENT_DAY} picks for Music Madness — Best of the 70s:\n${picks.map((p,i)=>`${i+1}. ${p}`).join("\n")}\n\nCast your votes:`;
+    if(navigator.share){
+      navigator.share({title:"Music Madness · Best of the 70s",text:`${text} ${url}`}).catch(()=>{});
+    } else {
+      navigator.clipboard.writeText(`${text} ${url}`).then(()=>{
+        setDayShareCopied(true);
+        setTimeout(()=>setDayShareCopied(false),2500);
+      });
+    }
+  };
 
   const Header=()=>(
     <div style={{position:"fixed",top:0,left:0,right:0,zIndex:300,background:C.white,borderBottom:`2px solid ${C.black}`,padding:"0 20px",height:56,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
@@ -1170,6 +1681,7 @@ export default function App(){
       <style>{GLOBAL_CSS}</style>
       <Header/>
       <div style={{flex:1,display:"flex",flexDirection:"column",paddingTop:56,minHeight:0}}>
+        <PlaylistBanner playlists={LIVE_PLAYLISTS}/>
         <div style={{borderBottom:`1px solid ${C.gray100}`,padding:"8px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",background:C.white,flexShrink:0}}>
           <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:12,textTransform:"uppercase",letterSpacing:2,color:C.gray600,display:"flex",alignItems:"center",gap:8}}>
             <span className="live-dot" style={{display:"inline-block",width:7,height:7,borderRadius:"50%",background:C.yellow}}/>
@@ -1287,7 +1799,12 @@ export default function App(){
     <div style={{minHeight:"100vh",background:C.gray50}}>
       <style>{GLOBAL_CSS}</style>
       <Header/>
-      <div style={{maxWidth:560,margin:"0 auto",padding:"72px 16px 48px"}}>
+      {showWelcome&&<WelcomePopup onClose={()=>{setShowWelcome(false);localStorage.setItem("mm_welcomed","1");}}/>}
+      {showConfetti&&<ConfettiBurst onDone={()=>setShowConfetti(false)}/>}
+      <div style={{position:"fixed",top:56,left:0,right:0,zIndex:200,background:C.white,borderBottom:`1px solid ${C.gray100}`}}>
+        <PlaylistBanner playlists={LIVE_PLAYLISTS}/>
+      </div>
+      <div style={{maxWidth:560,margin:"0 auto",padding:`${LIVE_PLAYLISTS?.spotify||LIVE_PLAYLISTS?.apple?104:72}px 16px 48px`}}>
         <div style={{marginBottom:28}}>
           <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
             {CURRENT_DAY>0&&<span className="live-dot" style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.yellow,flexShrink:0}}/>}
@@ -1297,6 +1814,18 @@ export default function App(){
             </div>
           </div>
           {todayMs.map(m=><VoteCard key={m.id} m={m} voted={voted} pending={pending} setPending={setPending} confirmVote={confirmVote} highlight={m.id===highlightId}/>)}
+          {allTodayVoted&&(
+            <div className="slide-up" style={{background:C.black,borderRadius:12,padding:"16px 20px",marginTop:8,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12}}>
+              <div>
+                <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:18,color:C.yellow,letterSpacing:1}}>All picks in! 🎵</div>
+                <div style={{fontSize:12,color:C.gray400,marginTop:2}}>Come back tomorrow for the next round.</div>
+              </div>
+              <button onClick={handleDayShare}
+                style={{flexShrink:0,padding:"8px 16px",background:C.yellow,border:"none",borderRadius:8,color:C.black,fontSize:12,fontWeight:800,fontFamily:"'Barlow Condensed',sans-serif",textTransform:"uppercase",letterSpacing:1,cursor:"pointer"}}>
+                {daySharCopied?"Copied!":"Share My Picks"}
+              </button>
+            </div>
+          )}
         </div>
         {pastMs.length>0&&(
           <div>
