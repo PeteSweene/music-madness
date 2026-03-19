@@ -1198,11 +1198,11 @@ function SpotifyPreview({song}){
   );
 }
 
-function VoteCard({m,voted,pending,setPending,confirmVote,highlight}){
+function VoteCard({m,voted,pending,setPending,confirmVote,highlight,peek}){
   const uv=voted[m.id],pend=pending[m.id];
   const isLive=m.day===CURRENT_DAY,canVote=isLive&&!uv&&!m.locked;
   const tot=m.votes.a+m.votes.b;
-  const showResults=(!!uv||!!m.winner)&&CURRENT_DAY>0;
+  const showResults=(!!uv||!!m.winner||peek)&&CURRENT_DAY>0;
   const [copied,setCopied]=useState(false);
   const cardRef=useRef(null);
 
@@ -1305,6 +1305,7 @@ export default function App(){
   const [showConfetti,setShowConfetti]=useState(false);
   const [showWelcome,setShowWelcome]=useState(()=>!localStorage.getItem("mm_welcomed"));
   const [daySharCopied,setDayShareCopied]=useState(false);
+  const [peekResults,setPeekResults]=useState(false);
   const [highlightId,setHighlightId]=useState(()=>{
     const p=new URLSearchParams(window.location.search);
     const id=parseInt(p.get("m"));
@@ -1813,7 +1814,7 @@ export default function App(){
               <div style={{fontSize:22,fontWeight:900,fontFamily:"'Bebas Neue',sans-serif",letterSpacing:1,color:C.black,lineHeight:1}}>{CURRENT_DAY===0?"Day 1 Matchups":`Day ${CURRENT_DAY} Matchups`}</div>
             </div>
           </div>
-          {todayMs.map(m=><VoteCard key={m.id} m={m} voted={voted} pending={pending} setPending={setPending} confirmVote={confirmVote} highlight={m.id===highlightId}/>)}
+          {todayMs.map(m=><VoteCard key={m.id} m={m} voted={voted} pending={pending} setPending={setPending} confirmVote={confirmVote} highlight={m.id===highlightId} peek={peekResults}/>)}
           {allTodayVoted&&(
             <div className="slide-up" style={{background:C.black,borderRadius:12,padding:"16px 20px",marginTop:8,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12}}>
               <div>
@@ -1833,6 +1834,12 @@ export default function App(){
             {pastMs.map(m=><VoteCard key={m.id} m={m} voted={voted} pending={pending} setPending={setPending} confirmVote={confirmVote} highlight={m.id===highlightId}/>)}
           </div>
         )}
+        <div style={{textAlign:"center",paddingTop:24,paddingBottom:8}}>
+          <button onClick={()=>setPeekResults(p=>!p)}
+            style={{background:"none",border:"none",cursor:"pointer",color:C.gray300,fontSize:11,fontFamily:"'Barlow Condensed',sans-serif",letterSpacing:1}}>
+            {peekResults?"hide results":"..."}
+          </button>
+        </div>
       </div>
     </div>
   );
