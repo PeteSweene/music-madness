@@ -1407,11 +1407,22 @@ export default function App(){
 
   const buildTree=r64s=>{
     const r0=r64s.map(m=>({s1:m.song1,s2:m.song2,m}));
-    // Only show a winner advancing if the source matchup is actually locked
     const lockedWinner=m=>m?.locked?getWinner(m):null;
-    const r1=[];for(let i=0;i<r64s.length;i+=2)r1.push({s1:lockedWinner(r64s[i]),s2:lockedWinner(r64s[i+1]),m:null});
-    const r2=[];for(let i=0;i<r1.length;i+=2)r2.push({s1:r1[i].s1&&r1[i+1]?.s1?r1[i].s1:null,s2:r1[i].s1&&r1[i+1]?.s1?r1[i+1].s1:null,m:null});
-    const r3=[{s1:r2[0]?.s1&&r2[1]?.s1?r2[0].s1:null,s2:r2[0]?.s1&&r2[1]?.s1?r2[1].s1:null,m:null}];
+    // R32: only show songs if BOTH feeders are locked
+    const r1=[];
+    for(let i=0;i<r64s.length;i+=2){
+      const bothLocked=r64s[i]?.locked&&r64s[i+1]?.locked;
+      r1.push({s1:bothLocked?lockedWinner(r64s[i]):null, s2:bothLocked?lockedWinner(r64s[i+1]):null, m:null});
+    }
+    // S16: only show songs if BOTH feeders in R32 are filled
+    const r2=[];
+    for(let i=0;i<r1.length;i+=2){
+      const bothFilled=r1[i].s1&&r1[i+1]?.s1;
+      r2.push({s1:bothFilled?r1[i].s1:null, s2:bothFilled?r1[i+1].s1:null, m:null});
+    }
+    // E8: only show songs if BOTH feeders in S16 are filled
+    const bothFilled=r2[0]?.s1&&r2[1]?.s1;
+    const r3=[{s1:bothFilled?r2[0].s1:null, s2:bothFilled?r2[1].s1:null, m:null}];
     return [r0,r1,r2,r3];
   };
   const eastTree=buildTree(eastMs),westTree=buildTree(westMs);
