@@ -1407,9 +1407,11 @@ export default function App(){
 
   const buildTree=r64s=>{
     const r0=r64s.map(m=>({s1:m.song1,s2:m.song2,m}));
-    const r1=[];for(let i=0;i<r64s.length;i+=2)r1.push({s1:getWinner(r64s[i]),s2:getWinner(r64s[i+1]),m:null});
-    const r2=[];for(let i=0;i<r1.length;i+=2)r2.push({s1:r1[i].s1,s2:r1[i+1]?.s1,m:null});
-    const r3=[{s1:r2[0]?.s1,s2:r2[1]?.s1,m:null}];
+    // Only show a winner advancing if the source matchup is actually locked
+    const lockedWinner=m=>m?.locked?getWinner(m):null;
+    const r1=[];for(let i=0;i<r64s.length;i+=2)r1.push({s1:lockedWinner(r64s[i]),s2:lockedWinner(r64s[i+1]),m:null});
+    const r2=[];for(let i=0;i<r1.length;i+=2)r2.push({s1:r1[i].s1&&r1[i+1]?.s1?r1[i].s1:null,s2:r1[i].s1&&r1[i+1]?.s1?r1[i+1].s1:null,m:null});
+    const r3=[{s1:r2[0]?.s1&&r2[1]?.s1?r2[0].s1:null,s2:r2[0]?.s1&&r2[1]?.s1?r2[1].s1:null,m:null}];
     return [r0,r1,r2,r3];
   };
   const eastTree=buildTree(eastMs),westTree=buildTree(westMs);
