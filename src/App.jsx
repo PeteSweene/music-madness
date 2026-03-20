@@ -34,7 +34,8 @@ const C = {
 };
 
 // ── Layout constants ──────────────────────────────────────────────────────────
-const CURRENT_DAY = 1;
+const CURRENT_DAY = 2;
+const WEEKEND_MODE = true; // flip to false Monday when reopening
 const LIVE_PLAYLISTS = { spotify: "https://open.spotify.com/playlist/0qYegEWazlLhQn3tIUKVwL?si=3a9995d57ede42bb", apple: "https://music.apple.com/us/playlist/top-64-1970s/pl.u-KJVvT1M2R3W" };
 const CARD_W = 150, CARD_H = 52, ROUND_GAP_X = 44, BASE_SLOT_H = 88;
 
@@ -1804,8 +1805,15 @@ export default function App(){
       {showConfetti&&<ConfettiBurst onDone={()=>setShowConfetti(false)}/>}
       <div style={{position:"fixed",top:56,left:0,right:0,zIndex:200,background:C.white,borderBottom:`1px solid ${C.gray100}`}}>
         <PlaylistBanner playlists={LIVE_PLAYLISTS}/>
+        {WEEKEND_MODE&&(
+          <div style={{padding:"8px 20px",background:C.yellow,display:"flex",alignItems:"center",gap:8}}>
+            <span style={{fontSize:13,color:C.black,fontFamily:"'Barlow Condensed',sans-serif",letterSpacing:0.5}}>
+              🌲 Heads up — I'm out in the woods so Music Madness is closed for the weekend. Come back Monday for the Round of 32!
+            </span>
+          </div>
+        )}
       </div>
-      <div style={{maxWidth:560,margin:"0 auto",padding:`${LIVE_PLAYLISTS?.spotify||LIVE_PLAYLISTS?.apple?104:72}px 16px 48px`}}>
+      <div style={{maxWidth:560,margin:"0 auto",padding:`${(LIVE_PLAYLISTS?.spotify||LIVE_PLAYLISTS?.apple?104:72)+(WEEKEND_MODE?36:0)}px 16px 48px`}}>
         <div style={{marginBottom:28}}>
           <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
             {CURRENT_DAY>0&&<span className="live-dot" style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.yellow,flexShrink:0}}/>}
