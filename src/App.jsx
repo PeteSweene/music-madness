@@ -1407,24 +1407,16 @@ export default function App(){
 
   const buildTree=r64s=>{
     const r0=r64s.map(m=>({s1:m.song1,s2:m.song2,m}));
-    // Only advance a song if the matchup has an actual winner set
     const hasWinner=m=>!!m?.winner;
     const winner=m=>m.winner==="a"?m.song1:m.song2;
-    // R32: only show songs if BOTH feeders have a winner
     const r1=[];
     for(let i=0;i<r64s.length;i+=2){
       const both=hasWinner(r64s[i])&&hasWinner(r64s[i+1]);
       r1.push({s1:both?winner(r64s[i]):null, s2:both?winner(r64s[i+1]):null, m:null});
     }
-    // S16: only show if BOTH R32 slots are filled
-    const r2=[];
-    for(let i=0;i<r1.length;i+=2){
-      const both=r1[i].s1&&r1[i+1]?.s1;
-      r2.push({s1:both?r1[i].s1:null, s2:both?r1[i+1].s1:null, m:null});
-    }
-    // E8: only show if BOTH S16 slots are filled
-    const both=r2[0]?.s1&&r2[1]?.s1;
-    const r3=[{s1:both?r2[0].s1:null, s2:both?r2[1].s1:null, m:null}];
+    // S16 and E8 stay blank until real matchup data exists in Supabase
+    const r2=r1.map(()=>({s1:null,s2:null,m:null})).slice(0,r1.length/2);
+    const r3=[{s1:null,s2:null,m:null}];
     return [r0,r1,r2,r3];
   };
   const eastTree=buildTree(eastMs),westTree=buildTree(westMs);
