@@ -34,8 +34,8 @@ const C = {
 };
 
 // ── Layout constants ──────────────────────────────────────────────────────────
-const CURRENT_DAY = 2;
-const WEEKEND_MODE = true; // flip to false Monday when reopening
+const CURRENT_DAY = 3;
+const WEEKEND_MODE = false;
 const LIVE_PLAYLISTS = { spotify: "https://open.spotify.com/playlist/0qYegEWazlLhQn3tIUKVwL?si=3a9995d57ede42bb", apple: "https://music.apple.com/us/playlist/top-64-1970s/pl.u-KJVvT1M2R3W" };
 const CARD_W = 150, CARD_H = 52, ROUND_GAP_X = 44, BASE_SLOT_H = 88;
 
@@ -234,15 +234,36 @@ const PAIRS = [
   [11,12,2],[27,28,2],[43,44,2],[59,60,2],
   [13,14,2],[29,30,2],[45,46,2],[61,62,2],
   [15,16,2],[31,32,2],[47,48,2],[63,64,2],
-  // Day 3 — R32 first half (8 matchups, 2 per region) — added after R64 winners known
+  // Day 3 — R32 first half (8 matchups, 2 per region)
+  [1,4,3],[17,19,3],[34,35,3],[49,52,3],
+  [6,8,3],[21,23,3],[38,39,3],[53,55,3],
   // Day 4 — R32 second half (8 matchups, 2 per region)
-  // Days 5-6 — S16 (4 matchups/day), Days 7-8 — E8 (2/day)
-  // Days 9-10 — Final Four (1/day), Day 11 — Final (1)
+  [10,11,4],[26,27,4],[42,43,4],[57,59,4],
+  [14,15,4],[29,32,4],[45,47,4],[62,63,4],
+];
+
+const PAIR_REGIONS = [
+  // Day 1
+  'Woodstock','Watergate','Haight-Ashbury','Laurel Canyon',
+  'Woodstock','Watergate','Haight-Ashbury','Laurel Canyon',
+  'Woodstock','Watergate','Haight-Ashbury','Laurel Canyon',
+  'Woodstock','Watergate','Haight-Ashbury','Laurel Canyon',
+  // Day 2
+  'Woodstock','Watergate','Haight-Ashbury','Laurel Canyon',
+  'Woodstock','Watergate','Haight-Ashbury','Laurel Canyon',
+  'Woodstock','Watergate','Haight-Ashbury','Laurel Canyon',
+  'Woodstock','Watergate','Haight-Ashbury','Laurel Canyon',
+  // Day 3
+  'Woodstock','Watergate','Haight-Ashbury','Laurel Canyon',
+  'Woodstock','Watergate','Haight-Ashbury','Laurel Canyon',
+  // Day 4
+  'Woodstock','Watergate','Haight-Ashbury','Laurel Canyon',
+  'Woodstock','Watergate','Haight-Ashbury','Laurel Canyon',
 ];
 
 const buildMatchups = () => PAIRS.map(([a,b,day],i) => ({
   id:i+1, song1:byId(a), song2:byId(b), day,
-  region: a<=16?"Woodstock":a<=32?"Watergate":a<=48?"Haight-Ashbury":"Laurel Canyon",
+  region: PAIR_REGIONS[i],
   locked: day<CURRENT_DAY,
   winner: null,
   votes: {a:0,b:0},
@@ -1400,27 +1421,49 @@ export default function App(){
   },[]);
 
   const getWinner=m=>m.winner?(m.winner==="a"?m.song1:m.song2):null;
+  const eastR64=matchups.filter(m=>m.region==="Woodstock"&&m.day<=2).sort((a,b)=>a.id-b.id);
+  const westR64=matchups.filter(m=>m.region==="Watergate"&&m.day<=2).sort((a,b)=>a.id-b.id);
+  const northR64=matchups.filter(m=>m.region==="Haight-Ashbury"&&m.day<=2).sort((a,b)=>a.id-b.id);
+  const southR64=matchups.filter(m=>m.region==="Laurel Canyon"&&m.day<=2).sort((a,b)=>a.id-b.id);
+  const eastR32=matchups.filter(m=>m.region==="Woodstock"&&m.day>=3&&m.day<=4).sort((a,b)=>a.id-b.id);
+  const westR32=matchups.filter(m=>m.region==="Watergate"&&m.day>=3&&m.day<=4).sort((a,b)=>a.id-b.id);
+  const northR32=matchups.filter(m=>m.region==="Haight-Ashbury"&&m.day>=3&&m.day<=4).sort((a,b)=>a.id-b.id);
+  const southR32=matchups.filter(m=>m.region==="Laurel Canyon"&&m.day>=3&&m.day<=4).sort((a,b)=>a.id-b.id);
+  // Keep eastMs etc for vote feed and semi logic
   const eastMs=matchups.filter(m=>m.region==="Woodstock").sort((a,b)=>a.id-b.id);
   const westMs=matchups.filter(m=>m.region==="Watergate").sort((a,b)=>a.id-b.id);
   const northMs=matchups.filter(m=>m.region==="Haight-Ashbury").sort((a,b)=>a.id-b.id);
   const southMs=matchups.filter(m=>m.region==="Laurel Canyon").sort((a,b)=>a.id-b.id);
 
-  const buildTree=r64s=>{
+  const buildTree=(r64s,r32s,s16s,e8s)=>{
     const r0=r64s.map(m=>({s1:m.song1,s2:m.song2,m}));
     const hasWinner=m=>!!m?.winner;
     const winner=m=>m.winner==="a"?m.song1:m.song2;
-    const r1=[];
-    for(let i=0;i<r64s.length;i+=2){
-      const both=hasWinner(r64s[i])&&hasWinner(r64s[i+1]);
-      r1.push({s1:both?winner(r64s[i]):null, s2:both?winner(r64s[i+1]):null, m:null});
-    }
-    // S16 and E8 stay blank until real matchup data exists in Supabase
-    const r2=r1.map(()=>({s1:null,s2:null,m:null})).slice(0,r1.length/2);
-    const r3=[{s1:null,s2:null,m:null}];
+    // R32: use actual matchup data, show songs only when both R64 feeders have winners
+    const r1=r32s.length>0
+      ? r32s.map(m=>({s1:m.song1,s2:m.song2,m}))
+      : Array.from({length:4},(_,i)=>{
+          const both=hasWinner(r64s[i*2])&&hasWinner(r64s[i*2+1]);
+          return {s1:both?winner(r64s[i*2]):null,s2:both?winner(r64s[i*2+1]):null,m:null};
+        });
+    // S16: use actual data or blank
+    const r2=s16s.length>0
+      ? s16s.map(m=>({s1:m.song1,s2:m.song2,m}))
+      : Array.from({length:2},(_,i)=>{
+          const both=hasWinner(r32s[i*2])&&hasWinner(r32s[i*2+1]);
+          return {s1:both?winner(r32s[i*2]):null,s2:both?winner(r32s[i*2+1]):null,m:null};
+        });
+    // E8: use actual data or blank
+    const r3=e8s.length>0
+      ? e8s.map(m=>({s1:m.song1,s2:m.song2,m}))
+      : [{s1:hasWinner(r32s[0])&&hasWinner(r32s[1])?winner(r32s[0]):null,
+          s2:hasWinner(r32s[0])&&hasWinner(r32s[1])?winner(r32s[1]):null,m:null}];
     return [r0,r1,r2,r3];
   };
-  const eastTree=buildTree(eastMs),westTree=buildTree(westMs);
-  const northTree=buildTree(northMs),southTree=buildTree(southMs);
+  const eastTree=buildTree(eastR64,eastR32,[],[]);
+  const westTree=buildTree(westR64,westR32,[],[]);
+  const northTree=buildTree(northR64,northR32,[],[]);
+  const southTree=buildTree(southR64,southR32,[],[]);
   const REGION_H=16*BASE_SLOT_H;
 
   const renderRegion=(tree,getX,pixelOffsetY=0)=>{
