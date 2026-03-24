@@ -1439,25 +1439,21 @@ export default function App(){
     const r0=r64s.map(m=>({s1:m.song1,s2:m.song2,m}));
     const hasWinner=m=>!!m?.winner;
     const winner=m=>m.winner==="a"?m.song1:m.song2;
-    // R32: use actual matchup data, show songs only when both R64 feeders have winners
+    // R32: use actual matchup data if it exists
     const r1=r32s.length>0
       ? r32s.map(m=>({s1:m.song1,s2:m.song2,m}))
       : Array.from({length:4},(_,i)=>{
           const both=hasWinner(r64s[i*2])&&hasWinner(r64s[i*2+1]);
           return {s1:both?winner(r64s[i*2]):null,s2:both?winner(r64s[i*2+1]):null,m:null};
         });
-    // S16: use actual data or blank
+    // S16: only use actual matchup data, never infer
     const r2=s16s.length>0
       ? s16s.map(m=>({s1:m.song1,s2:m.song2,m}))
-      : Array.from({length:2},(_,i)=>{
-          const both=hasWinner(r32s[i*2])&&hasWinner(r32s[i*2+1]);
-          return {s1:both?winner(r32s[i*2]):null,s2:both?winner(r32s[i*2+1]):null,m:null};
-        });
-    // E8: use actual data or blank
+      : Array.from({length:2},()=>({s1:null,s2:null,m:null}));
+    // E8: only use actual matchup data, never infer
     const r3=e8s.length>0
       ? e8s.map(m=>({s1:m.song1,s2:m.song2,m}))
-      : [{s1:hasWinner(r32s[0])&&hasWinner(r32s[1])?winner(r32s[0]):null,
-          s2:hasWinner(r32s[0])&&hasWinner(r32s[1])?winner(r32s[1]):null,m:null}];
+      : [{s1:null,s2:null,m:null}];
     return [r0,r1,r2,r3];
   };
   const eastTree=buildTree(eastR64,eastR32,[],[]);
