@@ -34,7 +34,7 @@ const C = {
 };
 
 // ── Layout constants ──────────────────────────────────────────────────────────
-const CURRENT_DAY = 4;
+const CURRENT_DAY = 5;
 const WEEKEND_MODE = false;
 const LIVE_PLAYLISTS = { spotify: "https://open.spotify.com/playlist/0qYegEWazlLhQn3tIUKVwL?si=3a9995d57ede42bb", apple: "https://music.apple.com/us/playlist/top-64-1970s/pl.u-KJVvT1M2R3W" };
 const CARD_W = 150, CARD_H = 52, ROUND_GAP_X = 44, BASE_SLOT_H = 88;
@@ -234,7 +234,10 @@ const PAIRS = [
   [11,12,2],[27,28,2],[43,44,2],[59,60,2],
   [13,14,2],[29,30,2],[45,46,2],[61,62,2],
   [15,16,2],[31,32,2],[47,48,2],[63,64,2],
-  // Day 3 — R32 first half (8 matchups, 2 per region)
+  // Day 5 — S16 first half (4 matchups, 1 per region)
+  [1,8,5],[17,23,5],[34,38,5],[49,55,5],
+  // Day 6 — S16 second half (4 matchups, 1 per region)
+  [11,15,6],[27,29,6],[42,45,6],[59,63,6],
   [1,4,3],[17,19,3],[34,35,3],[49,52,3],
   [6,8,3],[21,23,3],[38,39,3],[53,55,3],
   // Day 4 — R32 second half (8 matchups, 2 per region)
@@ -258,6 +261,10 @@ const PAIR_REGIONS = [
   'Woodstock','Watergate','Haight-Ashbury','Laurel Canyon',
   // Day 4
   'Woodstock','Watergate','Haight-Ashbury','Laurel Canyon',
+  'Woodstock','Watergate','Haight-Ashbury','Laurel Canyon',
+  // Day 5
+  'Woodstock','Watergate','Haight-Ashbury','Laurel Canyon',
+  // Day 6
   'Woodstock','Watergate','Haight-Ashbury','Laurel Canyon',
 ];
 
@@ -1429,6 +1436,10 @@ export default function App(){
   const westR32=matchups.filter(m=>m.region==="Watergate"&&m.day>=3&&m.day<=4).sort((a,b)=>a.id-b.id);
   const northR32=matchups.filter(m=>m.region==="Haight-Ashbury"&&m.day>=3&&m.day<=4).sort((a,b)=>a.id-b.id);
   const southR32=matchups.filter(m=>m.region==="Laurel Canyon"&&m.day>=3&&m.day<=4).sort((a,b)=>a.id-b.id);
+  const eastS16=matchups.filter(m=>m.region==="Woodstock"&&m.day>=5&&m.day<=6).sort((a,b)=>a.id-b.id);
+  const westS16=matchups.filter(m=>m.region==="Watergate"&&m.day>=5&&m.day<=6).sort((a,b)=>a.id-b.id);
+  const northS16=matchups.filter(m=>m.region==="Haight-Ashbury"&&m.day>=5&&m.day<=6).sort((a,b)=>a.id-b.id);
+  const southS16=matchups.filter(m=>m.region==="Laurel Canyon"&&m.day>=5&&m.day<=6).sort((a,b)=>a.id-b.id);
   // Keep eastMs etc for vote feed and semi logic
   const eastMs=matchups.filter(m=>m.region==="Woodstock").sort((a,b)=>a.id-b.id);
   const westMs=matchups.filter(m=>m.region==="Watergate").sort((a,b)=>a.id-b.id);
@@ -1456,10 +1467,10 @@ export default function App(){
       : [{s1:null,s2:null,m:null}];
     return [r0,r1,r2,r3];
   };
-  const eastTree=buildTree(eastR64,eastR32,[],[]);
-  const westTree=buildTree(westR64,westR32,[],[]);
-  const northTree=buildTree(northR64,northR32,[],[]);
-  const southTree=buildTree(southR64,southR32,[],[]);
+  const eastTree=buildTree(eastR64,eastR32,eastS16,[]);
+  const westTree=buildTree(westR64,westR32,westS16,[]);
+  const northTree=buildTree(northR64,northR32,northS16,[]);
+  const southTree=buildTree(southR64,southR32,southS16,[]);
   const REGION_H=16*BASE_SLOT_H;
 
   const renderRegion=(tree,getX,pixelOffsetY=0)=>{
