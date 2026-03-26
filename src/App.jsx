@@ -34,7 +34,7 @@ const C = {
 };
 
 // ── Layout constants ──────────────────────────────────────────────────────────
-const CURRENT_DAY = 5;
+const CURRENT_DAY = 6;
 const WEEKEND_MODE = false;
 const LIVE_PLAYLISTS = { spotify: "https://open.spotify.com/playlist/0qYegEWazlLhQn3tIUKVwL?si=3a9995d57ede42bb", apple: "https://music.apple.com/us/playlist/top-64-1970s/pl.u-KJVvT1M2R3W" };
 const CARD_W = 150, CARD_H = 52, ROUND_GAP_X = 44, BASE_SLOT_H = 88;
