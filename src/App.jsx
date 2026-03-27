@@ -34,7 +34,7 @@ const C = {
 };
 
 // ── Layout constants ──────────────────────────────────────────────────────────
-const CURRENT_DAY = 6;
+const CURRENT_DAY = 7;
 const WEEKEND_MODE = false;
 const LIVE_PLAYLISTS = { spotify: "https://open.spotify.com/playlist/0qYegEWazlLhQn3tIUKVwL?si=3a9995d57ede42bb", apple: "https://music.apple.com/us/playlist/top-64-1970s/pl.u-KJVvT1M2R3W" };
 const CARD_W = 150, CARD_H = 52, ROUND_GAP_X = 44, BASE_SLOT_H = 88;
@@ -244,6 +244,8 @@ const PAIRS = [
   [1,8,5],[17,23,5],[34,38,5],[49,55,5],
   // Day 6 — S16 second half (4 matchups, 1 per region)
   [11,15,6],[27,29,6],[42,45,6],[59,63,6],
+  // Day 7 — E8 (4 matchups, 1 per region)
+  [1,15,7],[17,27,7],[34,42,7],[49,63,7],
 ];
 
 const PAIR_REGIONS = [
@@ -266,6 +268,8 @@ const PAIR_REGIONS = [
   // Day 5
   'Woodstock','Watergate','Haight-Ashbury','Laurel Canyon',
   // Day 6
+  'Woodstock','Watergate','Haight-Ashbury','Laurel Canyon',
+  // Day 7
   'Woodstock','Watergate','Haight-Ashbury','Laurel Canyon',
 ];
 
@@ -1441,6 +1445,10 @@ export default function App(){
   const westS16=matchups.filter(m=>m.region==="Watergate"&&m.day>=5&&m.day<=6).sort((a,b)=>a.id-b.id);
   const northS16=matchups.filter(m=>m.region==="Haight-Ashbury"&&m.day>=5&&m.day<=6).sort((a,b)=>a.id-b.id);
   const southS16=matchups.filter(m=>m.region==="Laurel Canyon"&&m.day>=5&&m.day<=6).sort((a,b)=>a.id-b.id);
+  const eastE8=matchups.filter(m=>m.region==="Woodstock"&&m.day===7).sort((a,b)=>a.id-b.id);
+  const westE8=matchups.filter(m=>m.region==="Watergate"&&m.day===7).sort((a,b)=>a.id-b.id);
+  const northE8=matchups.filter(m=>m.region==="Haight-Ashbury"&&m.day===7).sort((a,b)=>a.id-b.id);
+  const southE8=matchups.filter(m=>m.region==="Laurel Canyon"&&m.day===7).sort((a,b)=>a.id-b.id);
   // Keep eastMs etc for vote feed and semi logic
   const eastMs=matchups.filter(m=>m.region==="Woodstock").sort((a,b)=>a.id-b.id);
   const westMs=matchups.filter(m=>m.region==="Watergate").sort((a,b)=>a.id-b.id);
@@ -1468,10 +1476,10 @@ export default function App(){
       : [{s1:null,s2:null,m:null}];
     return [r0,r1,r2,r3];
   };
-  const eastTree=buildTree(eastR64,eastR32,eastS16,[]);
-  const westTree=buildTree(westR64,westR32,westS16,[]);
-  const northTree=buildTree(northR64,northR32,northS16,[]);
-  const southTree=buildTree(southR64,southR32,southS16,[]);
+  const eastTree=buildTree(eastR64,eastR32,eastS16,eastE8);
+  const westTree=buildTree(westR64,westR32,westS16,westE8);
+  const northTree=buildTree(northR64,northR32,northS16,northE8);
+  const southTree=buildTree(southR64,southR32,southS16,southE8);
   const REGION_H=16*BASE_SLOT_H;
 
   const renderRegion=(tree,getX,pixelOffsetY=0)=>{
