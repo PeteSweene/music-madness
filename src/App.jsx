@@ -1931,6 +1931,3 @@ export default function App(){
     </div>
   );
 }
-v>
-  );
-}
