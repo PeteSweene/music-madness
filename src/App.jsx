@@ -247,7 +247,7 @@ const PAIRS = [
   // Day 7 — E8 (4 matchups, 1 per region)
   [1,15,7],[17,27,7],[34,42,7],[49,63,7],
   // Day 8 — Final Four (2 matchups)
-  [15,17,8],[34,49,8],
+  [15,34,8],[17,49,8],
 ];
 
 const PAIR_REGIONS = [
@@ -274,7 +274,7 @@ const PAIR_REGIONS = [
   // Day 7
   'Woodstock','Watergate','Haight-Ashbury','Laurel Canyon',
   // Day 8 — Final Four
-  'Woodstock','Haight-Ashbury',
+  'Woodstock','Watergate',
 ];
 
 const buildMatchups = () => PAIRS.map(([a,b,day],i) => ({
@@ -1791,7 +1791,7 @@ export default function App(){
                 const eastSemi=rWin(eastMs), northSemi=rWin(northMs), westSemi=rWin(westMs), southSemi=rWin(southMs);
                 // Final Four winners from day 8 matchups
                 const ff1=matchups.find(m=>m.day===8&&m.region==="Woodstock");
-                const ff2=matchups.find(m=>m.day===8&&m.region==="Haight-Ashbury");
+                const ff2=matchups.find(m=>m.day===8&&m.region==="Watergate");
                 const finalist0=ff1?.winner?(ff1.winner==="a"?ff1.song1:ff1.song2):null;
                 const finalist1=ff2?.winner?(ff2.winner==="a"?ff2.song1:ff2.song2):null;
                 const mkSCard=(song,x,cy)=>(
@@ -1929,5 +1929,8 @@ export default function App(){
         </div>
       </div>
     </div>
+  );
+}
+v>
   );
 }
