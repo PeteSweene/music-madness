@@ -34,7 +34,7 @@ const C = {
 };
 
 // ── Layout constants ──────────────────────────────────────────────────────────
-const CURRENT_DAY = 7;
+const CURRENT_DAY = 8;
 const WEEKEND_MODE = false;
 const LIVE_PLAYLISTS = { spotify: "https://open.spotify.com/playlist/0qYegEWazlLhQn3tIUKVwL?si=3a9995d57ede42bb", apple: "https://music.apple.com/us/playlist/top-64-1970s/pl.u-KJVvT1M2R3W" };
 const CARD_W = 150, CARD_H = 52, ROUND_GAP_X = 44, BASE_SLOT_H = 88;
@@ -246,6 +246,8 @@ const PAIRS = [
   [11,15,6],[27,29,6],[42,45,6],[59,63,6],
   // Day 7 — E8 (4 matchups, 1 per region)
   [1,15,7],[17,27,7],[34,42,7],[49,63,7],
+  // Day 8 — Final Four (2 matchups)
+  [15,17,8],[34,49,8],
 ];
 
 const PAIR_REGIONS = [
@@ -271,6 +273,8 @@ const PAIR_REGIONS = [
   'Woodstock','Watergate','Haight-Ashbury','Laurel Canyon',
   // Day 7
   'Woodstock','Watergate','Haight-Ashbury','Laurel Canyon',
+  // Day 8 — Final Four
+  'Woodstock','Haight-Ashbury',
 ];
 
 const buildMatchups = () => PAIRS.map(([a,b,day],i) => ({
@@ -1783,8 +1787,13 @@ export default function App(){
                 const finalCY=(sLTopCY+sLBotCY)/2;
                 const finalTopCY=finalCY-CARD_H/2-6, finalBotCY=finalCY+CARD_H/2+6;
                 // E8 winners
-                const rWin = ms => { const m=ms[ms.length-1]; return m?.winner ? (m.winner==="a"?m.song1:m.song2) : null; };
+                const rWin = ms => { const m=ms.find(x=>x.day===7); return m?.winner ? (m.winner==="a"?m.song1:m.song2) : null; };
                 const eastSemi=rWin(eastMs), northSemi=rWin(northMs), westSemi=rWin(westMs), southSemi=rWin(southMs);
+                // Final Four winners from day 8 matchups
+                const ff1=matchups.find(m=>m.day===8&&m.region==="Woodstock");
+                const ff2=matchups.find(m=>m.day===8&&m.region==="Haight-Ashbury");
+                const finalist0=ff1?.winner?(ff1.winner==="a"?ff1.song1:ff1.song2):null;
+                const finalist1=ff2?.winner?(ff2.winner==="a"?ff2.song1:ff2.song2):null;
                 const mkSCard=(song,x,cy)=>(
                   <div key={`sc-${x}-${cy}`} style={{position:"absolute",left:x,top:cy-CARD_H/2,width:CARD_W,height:CARD_H,
                     background:C.white,border:`1.5px solid ${song?C.gray700:C.gray200}`,borderRadius:6,
@@ -1796,11 +1805,15 @@ export default function App(){
                     </>:<span style={{fontSize:10,color:C.gray300,fontFamily:"'Barlow Condensed',sans-serif"}}>TBD</span>}
                   </div>
                 );
-                const mkFCard=(cy)=>(
+                const mkFCard=(cy,song)=>(
                   <div key={`fc-${cy}`} style={{position:"absolute",left:FINAL_X,top:cy-CARD_H/2,width:CARD_W,height:CARD_H,
-                    background:C.white,border:`1.5px dashed ${C.gray200}`,borderRadius:6,
-                    display:"flex",alignItems:"center",justifyContent:"center"}}>
-                    <span style={{fontSize:10,color:C.gray300,fontFamily:"'Barlow Condensed',sans-serif"}}>TBD</span>
+                    background:song?C.black:C.white,border:`1.5px ${song?"solid":"dashed"} ${song?C.yellow:C.gray200}`,borderRadius:6,
+                    display:"flex",flexDirection:"column",justifyContent:"center",padding:"0 10px",overflow:"hidden"}}>
+                    {song?<>
+                      <div style={{fontSize:9,color:C.yellowDk,fontFamily:"'Barlow Condensed',sans-serif",textTransform:"uppercase",letterSpacing:1}}>#{song.seed} · {song.year}</div>
+                      <div style={{fontSize:12,fontWeight:700,color:C.yellow,fontFamily:"'Barlow Condensed',sans-serif",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{song.title}</div>
+                      <div style={{fontSize:10,color:C.yellowLt,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{song.artist}</div>
+                    </>:<span style={{fontSize:10,color:C.gray300,fontFamily:"'Barlow Condensed',sans-serif"}}>TBD</span>}
                   </div>
                 );
                 return (<>
@@ -1828,8 +1841,8 @@ export default function App(){
                   {mkSCard(westSemi,  SEMI_R_X, sRTopCY)}
                   {mkSCard(southSemi, SEMI_R_X, sRBotCY)}
                   <div key="final-label" style={{position:"absolute",left:FINAL_X,top:Math.min(finalTopCY,finalBotCY)-CARD_H/2-22,width:CARD_W,textAlign:"center",fontFamily:"'Barlow Condensed',sans-serif",fontSize:9,textTransform:"uppercase",letterSpacing:2,color:C.yellow,display:"flex",alignItems:"center",justifyContent:"center",gap:4}}><Trophy size={10} color={C.yellow}/>Final</div>
-                  {mkFCard(finalTopCY)}
-                  {mkFCard(finalBotCY)}
+                  {mkFCard(finalTopCY,finalist0)}
+                  {mkFCard(finalBotCY,finalist1)}
                 </>);
               })()}
               {eCards}{nCards}{wCards}{sCards}
