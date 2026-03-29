@@ -1168,7 +1168,7 @@ function WrapUpPopup({onClose, matchups, voted}){
   const pct = lockedWithVote.length>0 ? Math.round((correct/lockedWithVote.length)*100) : null;
 
   const handleShare = () => {
-    const text = `I voted with the people ${pct}% of the time in 64 Jams — Best of the 70s. Can you do better? ${window.location.origin}`;
+    const text = `I voted with the people ${pct}% of the time in 64 Jams — Best of the 70s. Did you do better? ${window.location.origin}`;
     if(navigator.share){
       navigator.share({title:"64 Jams",text}).catch(()=>{});
     } else {
@@ -1188,7 +1188,7 @@ function WrapUpPopup({onClose, matchups, voted}){
         <div style={{width:48,height:4,background:C.yellow,borderRadius:2,marginBottom:24}}/>
         <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:28,letterSpacing:2,color:C.black,lineHeight:1,marginBottom:20}}>That's a Wrap!</div>
         <div style={{fontSize:15,color:C.gray700,lineHeight:1.7,marginBottom:24}}>
-          Thank you all for playing along. This couldn't work without you and I appreciate all the shares, messages, and love. Shoot me a message and tell me what you thought — the songs, the website, all of it. I'll be back next March with another 64!
+          Thank you all for playing along. This couldn't work without you and I appreciate all the shares, notes, and love. Shoot me a message and tell me what you thought — the songs, the website, all of it. I'll be back next March with another 64!
         </div>
         {pct!==null&&(
           <div style={{background:C.black,borderRadius:12,padding:"16px 20px",marginBottom:20}}>
