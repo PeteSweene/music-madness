@@ -34,7 +34,7 @@ const C = {
 };
 
 // ── Layout constants ──────────────────────────────────────────────────────────
-const CURRENT_DAY = 8;
+const CURRENT_DAY = 9;
 const WEEKEND_MODE = false;
 const LIVE_PLAYLISTS = { spotify: "https://open.spotify.com/playlist/0qYegEWazlLhQn3tIUKVwL?si=3a9995d57ede42bb", apple: "https://music.apple.com/us/playlist/top-64-1970s/pl.u-KJVvT1M2R3W" };
 const CARD_W = 150, CARD_H = 52, ROUND_GAP_X = 44, BASE_SLOT_H = 88;
@@ -248,6 +248,8 @@ const PAIRS = [
   [1,15,7],[17,27,7],[34,42,7],[49,63,7],
   // Day 8 — Final Four (2 matchups)
   [15,34,8],[17,49,8],
+  // Day 9 — Final
+  [15,17,9],
 ];
 
 const PAIR_REGIONS = [
@@ -275,6 +277,8 @@ const PAIR_REGIONS = [
   'Woodstock','Watergate','Haight-Ashbury','Laurel Canyon',
   // Day 8 — Final Four
   'Woodstock','Watergate',
+  // Day 9 — Final
+  'Woodstock',
 ];
 
 const buildMatchups = () => PAIRS.map(([a,b,day],i) => ({
@@ -1134,7 +1138,7 @@ function WelcomePopup({onClose}){
           This year's 64 songs were selected by my brothers Casey and Joe, my father Les, and myself. Any grievances with the list can be directed to Les — that's how genetics work.
         </div>
         <div style={{fontSize:15,color:C.gray700,lineHeight:1.7,marginBottom:14}}>
-          Voting runs for 11 days — maybe more, I'm headed into the woods this weekend — so stick around and cast your votes. Share this with your friends, your family, your enemies, anyone with quality enough taste to participate in this democracy. Once a winner is crowned, that's it. No arguing, no complaining. That's how we got stuck with September for Best Party Song in 2021.
+          Voting runs for 9 days — so stick around and cast your votes. Share this with your friends, your family, your enemies, anyone with quality enough taste to participate in this democracy. Once a winner is crowned, that's it. No arguing, no complaining. That's how we got stuck with September for Best Party Song in 2021.
         </div>
         <div style={{fontSize:15,color:C.gray700,lineHeight:1.7,marginBottom:28}}>
           Thanks for stopping by. Have fun and be good to one another.
@@ -1149,6 +1153,57 @@ function WelcomePopup({onClose}){
             Don't show this again
           </button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Wrap-up popup ─────────────────────────────────────────────────────────────
+function WrapUpPopup({onClose, matchups, voted}){
+  const [shareCopied, setShareCopied] = useState(false);
+
+  // Calculate accuracy — compare user's vote against actual winner for all locked matchups
+  const lockedWithVote = matchups.filter(m=>m.locked&&m.winner&&voted[m.id]);
+  const correct = lockedWithVote.filter(m=>voted[m.id]===m.winner).length;
+  const pct = lockedWithVote.length>0 ? Math.round((correct/lockedWithVote.length)*100) : null;
+
+  const handleShare = () => {
+    const text = `I voted with the people ${pct}% of the time in 64 Jams — Best of the 70s. Can you do better? ${window.location.origin}`;
+    if(navigator.share){
+      navigator.share({title:"64 Jams",text}).catch(()=>{});
+    } else {
+      navigator.clipboard.writeText(text).then(()=>{
+        setShareCopied(true);
+        setTimeout(()=>setShareCopied(false),2500);
+      });
+    }
+  };
+
+  return (
+    <div style={{position:"fixed",inset:0,zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:"20px"}}
+      onClick={onClose}>
+      <div style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.6)",backdropFilter:"blur(4px)"}}/>
+      <div className="pop-in" onClick={e=>e.stopPropagation()}
+        style={{position:"relative",background:C.white,borderRadius:16,padding:"32px 28px",maxWidth:440,width:"100%",boxShadow:"0 24px 80px rgba(0,0,0,0.3)"}}>
+        <div style={{width:48,height:4,background:C.yellow,borderRadius:2,marginBottom:24}}/>
+        <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:28,letterSpacing:2,color:C.black,lineHeight:1,marginBottom:20}}>That's a Wrap!</div>
+        <div style={{fontSize:15,color:C.gray700,lineHeight:1.7,marginBottom:24}}>
+          Thank you all for playing along. This couldn't work without you and I appreciate all the shares, messages, and love. Shoot me a message and tell me what you thought — the songs, the website, all of it. I'll be back next March with another 64!
+        </div>
+        {pct!==null&&(
+          <div style={{background:C.black,borderRadius:12,padding:"16px 20px",marginBottom:20}}>
+            <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:36,color:C.yellow,letterSpacing:2,lineHeight:1}}>{pct}%</div>
+            <div style={{fontSize:13,color:C.gray400,marginTop:4}}>You voted with the majority {pct}% of the time across {lockedWithVote.length} matchups.</div>
+            <button onClick={handleShare}
+              style={{marginTop:12,width:"100%",padding:"10px",background:C.yellow,border:"none",borderRadius:8,color:C.black,fontSize:13,fontWeight:800,fontFamily:"'Barlow Condensed',sans-serif",textTransform:"uppercase",letterSpacing:1.5,cursor:"pointer"}}>
+              {shareCopied?"Copied!":"Share My Score"}
+            </button>
+          </div>
+        )}
+        <button onClick={onClose}
+          style={{width:"100%",padding:"14px",background:C.black,border:"none",borderRadius:10,color:C.white,fontWeight:800,fontSize:15,fontFamily:"'Barlow Condensed',sans-serif",textTransform:"uppercase",letterSpacing:2,cursor:"pointer"}}>
+          Close
+        </button>
       </div>
     </div>
   );
@@ -1342,6 +1397,7 @@ export default function App(){
   const [draftSong,setDraftSong]=useState(null);
   const [showConfetti,setShowConfetti]=useState(false);
   const [showWelcome,setShowWelcome]=useState(()=>!localStorage.getItem("mm_welcomed"));
+  const [showWrapUp,setShowWrapUp]=useState(false);
   const [daySharCopied,setDayShareCopied]=useState(false);
   const [peekResults,setPeekResults]=useState(false);
   const [highlightId,setHighlightId]=useState(()=>{
@@ -1410,6 +1466,7 @@ export default function App(){
     const todayIds=matchups.filter(m=>m.day===CURRENT_DAY).map(m=>m.id);
     const allDone=todayIds.every(id=>id===mid||newVoted[id]);
     if(allDone&&todayIds.length>0) setTimeout(()=>setShowConfetti(true),400);
+    if(allDone&&CURRENT_DAY===9) setTimeout(()=>setShowWrapUp(true),2000);
   };
 
   useEffect(()=>{
@@ -1794,6 +1851,8 @@ export default function App(){
                 const ff2=matchups.find(m=>m.day===8&&m.region==="Watergate");
                 const finalist0=ff1?.winner?(ff1.winner==="a"?ff1.song1:ff1.song2):null;
                 const finalist1=ff2?.winner?(ff2.winner==="a"?ff2.song1:ff2.song2):null;
+                const finalMatch=matchups.find(m=>m.day===9);
+                const champion=finalMatch?.winner?(finalMatch.winner==="a"?finalMatch.song1:finalMatch.song2):null;
                 const mkSCard=(song,x,cy)=>(
                   <div key={`sc-${x}-${cy}`} style={{position:"absolute",left:x,top:cy-CARD_H/2,width:CARD_W,height:CARD_H,
                     background:C.white,border:`1.5px solid ${song?C.gray700:C.gray200}`,borderRadius:6,
@@ -1805,14 +1864,14 @@ export default function App(){
                     </>:<span style={{fontSize:10,color:C.gray300,fontFamily:"'Barlow Condensed',sans-serif"}}>TBD</span>}
                   </div>
                 );
-                const mkFCard=(cy,song)=>(
+                const mkFCard=(cy,song,isChampion=false)=>(
                   <div key={`fc-${cy}`} style={{position:"absolute",left:FINAL_X,top:cy-CARD_H/2,width:CARD_W,height:CARD_H,
-                    background:song?C.black:C.white,border:`1.5px ${song?"solid":"dashed"} ${song?C.yellow:C.gray200}`,borderRadius:6,
+                    background:isChampion?C.yellow:song?C.black:C.white,border:`1.5px ${song?"solid":"dashed"} ${isChampion?C.yellow:song?C.yellow:C.gray200}`,borderRadius:6,
                     display:"flex",flexDirection:"column",justifyContent:"center",padding:"0 10px",overflow:"hidden"}}>
                     {song?<>
-                      <div style={{fontSize:9,color:C.yellowDk,fontFamily:"'Barlow Condensed',sans-serif",textTransform:"uppercase",letterSpacing:1}}>#{song.seed} · {song.year}</div>
-                      <div style={{fontSize:12,fontWeight:700,color:C.yellow,fontFamily:"'Barlow Condensed',sans-serif",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{song.title}</div>
-                      <div style={{fontSize:10,color:C.yellowLt,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{song.artist}</div>
+                      <div style={{fontSize:9,color:isChampion?C.black:C.yellowDk,fontFamily:"'Barlow Condensed',sans-serif",textTransform:"uppercase",letterSpacing:1}}>#{song.seed} · {song.year}</div>
+                      <div style={{fontSize:12,fontWeight:700,color:isChampion?C.black:C.yellow,fontFamily:"'Barlow Condensed',sans-serif",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{song.title}</div>
+                      <div style={{fontSize:10,color:isChampion?C.black:C.yellowLt,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{song.artist}</div>
                     </>:<span style={{fontSize:10,color:C.gray300,fontFamily:"'Barlow Condensed',sans-serif"}}>TBD</span>}
                   </div>
                 );
@@ -1841,8 +1900,8 @@ export default function App(){
                   {mkSCard(westSemi,  SEMI_R_X, sRTopCY)}
                   {mkSCard(southSemi, SEMI_R_X, sRBotCY)}
                   <div key="final-label" style={{position:"absolute",left:FINAL_X,top:Math.min(finalTopCY,finalBotCY)-CARD_H/2-22,width:CARD_W,textAlign:"center",fontFamily:"'Barlow Condensed',sans-serif",fontSize:9,textTransform:"uppercase",letterSpacing:2,color:C.yellow,display:"flex",alignItems:"center",justifyContent:"center",gap:4}}><Trophy size={10} color={C.yellow}/>Final</div>
-                  {mkFCard(finalTopCY,finalist0)}
-                  {mkFCard(finalBotCY,finalist1)}
+                  {mkFCard(finalTopCY, finalMatch?.song1 || finalist0, champion===finalMatch?.song1)}
+                  {mkFCard(finalBotCY, finalMatch?.song2 || finalist1, champion===finalMatch?.song2)}
                 </>);
               })()}
               {eCards}{nCards}{wCards}{sCards}
@@ -1881,6 +1940,7 @@ export default function App(){
       <style>{GLOBAL_CSS}</style>
       <Header/>
       {showWelcome&&<WelcomePopup onClose={()=>{setShowWelcome(false);localStorage.setItem("mm_welcomed","1");}}/>}
+      {showWrapUp&&<WrapUpPopup onClose={()=>setShowWrapUp(false)} matchups={matchups} voted={voted}/>}
       {showConfetti&&<ConfettiBurst onDone={()=>setShowConfetti(false)}/>}
       <div style={{position:"fixed",top:56,left:0,right:0,zIndex:200,background:C.white,borderBottom:`1px solid ${C.gray100}`}}>
         <PlaylistBanner playlists={LIVE_PLAYLISTS}/>
