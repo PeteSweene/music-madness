@@ -64,6 +64,7 @@ const GLOBAL_CSS = `
 // ── Archive themes (dark per-year) ────────────────────────────────────────────
 // Archive accent colors — each year gets a unique color on the shared light system
 const ARCHIVE_ACCENTS = {
+  "2026": { accent:"#E6CD09", accentDk:"#B8A407", accentBg:"#FEFCE8" }, // yellow — matches live theme
   "2025": { accent:"#D97706", accentDk:"#92400E", accentBg:"#FFFBEB" }, // amber
   "2024": { accent:"#DC2626", accentDk:"#7F1D1D", accentBg:"#FEF2F2" }, // red
   "2023": { accent:"#DB2777", accentDk:"#831843", accentBg:"#FDF2F8" }, // rose
