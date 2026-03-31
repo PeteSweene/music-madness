@@ -34,7 +34,7 @@ const C = {
 };
 
 // ── Layout constants ──────────────────────────────────────────────────────────
-const CURRENT_DAY = 9;
+const CURRENT_DAY = 10;
 const WEEKEND_MODE = false;
 const LIVE_PLAYLISTS = { spotify: "https://open.spotify.com/playlist/0qYegEWazlLhQn3tIUKVwL?si=3a9995d57ede42bb", apple: "https://music.apple.com/us/playlist/top-64-1970s/pl.u-KJVvT1M2R3W" };
 const CARD_W = 150, CARD_H = 52, ROUND_GAP_X = 44, BASE_SLOT_H = 88;
@@ -456,6 +456,39 @@ const ARCHIVES = [
     ],
     semis:[m("September","Like A G6"),m("Pursuit of Happiness (Remix)","Let's Get It Started")],
     final: m("September","Pursuit of Happiness (Remix)"),
+  },
+  {
+    year:"2026", theme:"Best Song of the 1970s", champion:"Stairway to Heaven", championArtist:"Led Zeppelin",
+    finalist:"The Chain", finalistArtist:"Fleetwood Mac",
+    playlists:{ spotify: "https://open.spotify.com/playlist/0qYegEWazlLhQn3tIUKVwL?si=3a9995d57ede42bb", apple: "https://music.apple.com/us/playlist/top-64-1970s/pl.u-KJVvT1M2R3W" },
+    regions:[
+      { name:"Woodstock",
+        r64:[m("Free Bird","Roxanne"),m("Tell Me Something Good","Rocky Mountain Way"),m("Born to Run","War Pigs"),m("Sir Duke","Brandy"),m("Dance The Night Away","Let's Stay Together"),m("Fire And Rain","Ventura Highway"),m("Can't You Hear Me Knockin","Jamming"),m("Stairway to Heaven","Angel")],
+        r32:[m("Free Bird","Rocky Mountain Way"),m("War Pigs","Brandy"),m("Let's Stay Together","Fire And Rain"),m("Jamming","Stairway to Heaven")],
+        s16:[m("Free Bird","Brandy"),m("Fire And Rain","Stairway to Heaven")],
+        e8:[m("Free Bird","Stairway to Heaven")],
+      },
+      { name:"Watergate",
+        r64:[m("The Chain","Summer Breeze"),m("Rebel Rebel","Kodachrome"),m("Gimme! Gimme! Gimme!","Stay With Me"),m("Tiny Dancer","Scarlet Begonias"),m("Dixie Chicken","Me and Bobby McGee"),m("I Will Survive","Stayin Alive"),m("Bennie and the Jets","Fly Like an Eagle"),m("Tumbling Dice","Crazy On You")],
+        r32:[m("The Chain","Rebel Rebel"),m("Gimme! Gimme! Gimme!","Tiny Dancer"),m("Me and Bobby McGee","I Will Survive"),m("Bennie and the Jets","Crazy On You")],
+        s16:[m("The Chain","Tiny Dancer"),m("I Will Survive","Bennie and the Jets")],
+        e8:[m("The Chain","I Will Survive")],
+      },
+      { name:"Haight-Ashbury",
+        r64:[m("Dreams","Superstition"),m("Night Moves","Going to California"),m("Into the Mystic","The Joker"),m("You're So Vain","The Boxer"),m("What's Going On","American Girl"),m("Let The Good Times Roll","Wonderful World Beautiful People"),m("Sweet Home Alabama","Lovely Day"),m("Margaritaville","Rock Lobster")],
+        r32:[m("Superstition","Night Moves"),m("The Joker","You're So Vain"),m("American Girl","Let The Good Times Roll"),m("Sweet Home Alabama","Margaritaville")],
+        s16:[m("Superstition","The Joker"),m("American Girl","Sweet Home Alabama")],
+        e8:[m("Superstition","American Girl")],
+      },
+      { name:"Laurel Canyon",
+        r64:[m("Bohemian Rhapsody","Shining Star"),m("Blue Sky","Jolene"),m("Band on the Run","Taking it to The Streets"),m("Sweet Emotion","Walk on the Wild Side"),m("Friend of the Devil","My Sweet Lord"),m("The Boys Are Back In Town","Angel From Montgomery"),m("Fool In The Rain","Rocky Mountain High"),m("Wish You Were Here","Beast of Burden")],
+        r32:[m("Bohemian Rhapsody","Jolene"),m("Band on the Run","Sweet Emotion"),m("Friend of the Devil","The Boys Are Back In Town"),m("Rocky Mountain High","Wish You Were Here")],
+        s16:[m("Bohemian Rhapsody","Sweet Emotion"),m("The Boys Are Back In Town","Wish You Were Here")],
+        e8:[m("Bohemian Rhapsody","Wish You Were Here")],
+      },
+    ],
+    semis:[m("Stairway to Heaven","Superstition"),m("The Chain","Bohemian Rhapsody")],
+    final: m("Stairway to Heaven","The Chain"),
   },
 ];
 
@@ -1132,16 +1165,13 @@ function WelcomePopup({onClose}){
         <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:13,textTransform:"uppercase",letterSpacing:3,color:C.gray500,marginBottom:24}}>Best of the 70s · 2026</div>
 
         <div style={{fontSize:15,color:C.gray700,lineHeight:1.7,marginBottom:14}}>
-          Every year I take my love of March Madness and music and mash them together. Created in 2021 to settle the debate over the best party song, this has become an annual tradition built around discussing, arguing, and remembering some great jams.
+          The moose out front should have told you we were closed.
         </div>
         <div style={{fontSize:15,color:C.gray700,lineHeight:1.7,marginBottom:14}}>
-          This year's 64 songs were selected by my brothers Casey and Joe, my father Les, and myself. Any grievances with the list can be directed to Les — that's how genetics work.
-        </div>
-        <div style={{fontSize:15,color:C.gray700,lineHeight:1.7,marginBottom:14}}>
-          Voting runs for 9 days — so stick around and cast your votes. Share this with your friends, your family, your enemies, anyone with quality enough taste to participate in this democracy. Once a winner is crowned, that's it. No arguing, no complaining. That's how we got stuck with September for Best Party Song in 2021.
+          Voting has wrapped up for 2026. <strong>Stairway to Heaven</strong> by Led Zeppelin has been crowned the Best Song of the 1970s, defeating The Chain by Fleetwood Mac in the Final.
         </div>
         <div style={{fontSize:15,color:C.gray700,lineHeight:1.7,marginBottom:28}}>
-          Thanks for stopping by. Have fun and be good to one another.
+          Browse the bracket below to see how it all played out, or check the Archive for results from previous years. See you next March!
         </div>
 
         <button onClick={onClose}
@@ -1168,7 +1198,7 @@ function WrapUpPopup({onClose, matchups, voted}){
   const pct = lockedWithVote.length>0 ? Math.round((correct/lockedWithVote.length)*100) : null;
 
   const handleShare = () => {
-    const text = `I voted with the people ${pct}% of the time in 64 Jams — Best of the 70s. Did you do better? ${window.location.origin}`;
+    const text = `I voted with the people ${pct}% of the time in 64 Jams — Best of the 70s. Can you do better? ${window.location.origin}`;
     if(navigator.share){
       navigator.share({title:"64 Jams",text}).catch(()=>{});
     } else {
@@ -1188,7 +1218,7 @@ function WrapUpPopup({onClose, matchups, voted}){
         <div style={{width:48,height:4,background:C.yellow,borderRadius:2,marginBottom:24}}/>
         <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:28,letterSpacing:2,color:C.black,lineHeight:1,marginBottom:20}}>That's a Wrap!</div>
         <div style={{fontSize:15,color:C.gray700,lineHeight:1.7,marginBottom:24}}>
-          Thank you all for playing along. This couldn't work without you and I appreciate all the shares, notes, and love. Shoot me a message and tell me what you thought — the songs, the website, all of it. I'll be back next March with another 64!
+          Thank you all for playing along. This couldn't work without you and I appreciate all the shares, messages, and love. Shoot me a message and tell me what you thought — the songs, the website, all of it. I'll be back next March with another 64!
         </div>
         {pct!==null&&(
           <div style={{background:C.black,borderRadius:12,padding:"16px 20px",marginBottom:20}}>
@@ -1257,6 +1287,139 @@ function ConfettiBurst({onDone}){
     animate();
   },[]);
   return <canvas ref={canvasRef} style={{position:"fixed",inset:0,zIndex:500,pointerEvents:"none"}}/>;
+}
+
+// ── Tournament stats ──────────────────────────────────────────────────────────
+function TournamentStats({matchups, voted}){
+  const [uniqueVoters, setUniqueVoters] = useState(null);
+
+  useEffect(()=>{
+    supabase.rpc("count_unique_voters").then(({data})=>{
+      if(data!=null) setUniqueVoters(data);
+    }).catch(()=>{
+      // fallback: estimate from total votes on day 1
+      const d1 = matchups.filter(m=>m.day===1);
+      if(d1.length) setUniqueVoters(Math.round((d1.reduce((s,m)=>s+m.votes.a+m.votes.b,0)/d1.length)));
+    });
+  },[]);
+
+  const locked = matchups.filter(m=>m.locked&&m.winner&&(m.votes.a+m.votes.b)>0);
+
+  // Closest matchups — smallest margin
+  const closest = [...locked]
+    .map(m=>({...m,total:m.votes.a+m.votes.b,margin:Math.abs(m.votes.a-m.votes.b)}))
+    .filter(m=>m.total>5)
+    .sort((a,b)=>a.margin-b.margin)
+    .slice(0,3);
+
+  // Cinderella stories — highest seed (worst seed number) that won
+  const cinderella = [...locked]
+    .filter(m=>{
+      const winner = m.winner==="a"?m.song1:m.song2;
+      const loser  = m.winner==="a"?m.song2:m.song1;
+      return winner&&loser&&winner.seed>loser.seed;
+    })
+    .map(m=>({
+      ...m,
+      winner: m.winner==="a"?m.song1:m.song2,
+      loser:  m.winner==="a"?m.song2:m.song1,
+      upset:  (m.winner==="a"?m.song1:m.song2).seed - (m.winner==="a"?m.song2:m.song1).seed,
+    }))
+    .sort((a,b)=>b.upset-a.upset)
+    .slice(0,3);
+
+  // Biggest blowouts
+  const blowouts = [...locked]
+    .map(m=>({...m,total:m.votes.a+m.votes.b,pct:Math.max(m.votes.a,m.votes.b)/Math.max(1,m.votes.a+m.votes.b)}))
+    .filter(m=>m.total>5)
+    .sort((a,b)=>b.pct-a.pct)
+    .slice(0,3);
+
+  // User accuracy
+  const withVote = locked.filter(m=>voted[m.id]);
+  const correct  = withVote.filter(m=>voted[m.id]===m.winner).length;
+  const accuracy = withVote.length>0?Math.round((correct/withVote.length)*100):null;
+
+  const StatCard=({title,children})=>(
+    <div style={{background:C.white,borderRadius:12,padding:"16px 20px",marginBottom:16,border:`1px solid ${C.gray100}`}}>
+      <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,textTransform:"uppercase",letterSpacing:2,color:C.gray500,marginBottom:12}}>{title}</div>
+      {children}
+    </div>
+  );
+
+  const MatchupRow=({m,label})=>{
+    const total=m.votes.a+m.votes.b;
+    const wVotes=m.winner==="a"?m.votes.a:m.votes.b;
+    const lVotes=m.winner==="a"?m.votes.b:m.votes.a;
+    const winner=m.winner==="a"?m.song1:m.song2;
+    const loser=m.winner==="a"?m.song2:m.song1;
+    return (
+      <div style={{marginBottom:10,paddingBottom:10,borderBottom:`1px solid ${C.gray100}`}}>
+        {label&&<div style={{fontSize:10,color:C.yellow,fontFamily:"'Barlow Condensed',sans-serif",textTransform:"uppercase",letterSpacing:1,marginBottom:3}}>{label}</div>}
+        <div style={{fontSize:13,fontWeight:700,color:C.black}}>{winner?.title} <span style={{fontWeight:400,color:C.gray500}}>def.</span> {loser?.title}</div>
+        <div style={{fontSize:11,color:C.gray400,marginTop:2}}>{Math.round(wVotes/total*100)}% – {Math.round(lVotes/total*100)}% · {total} votes</div>
+      </div>
+    );
+  };
+
+  return (
+    <div>
+      <div style={{marginBottom:28}}>
+        <div style={{fontSize:11,textTransform:"uppercase",letterSpacing:2,color:C.gray500,fontFamily:"'Barlow Condensed',sans-serif"}}>Tournament Over</div>
+        <div style={{fontSize:28,fontWeight:900,fontFamily:"'Bebas Neue',sans-serif",letterSpacing:1,color:C.black,lineHeight:1}}>2026 By The Numbers</div>
+      </div>
+
+      {/* Champion */}
+      <div style={{background:C.black,borderRadius:12,padding:"20px",marginBottom:16,display:"flex",alignItems:"center",gap:16}}>
+        <Trophy size={28} color={C.yellow}/>
+        <div>
+          <div style={{fontSize:11,color:C.yellowDk,fontFamily:"'Barlow Condensed',sans-serif",textTransform:"uppercase",letterSpacing:2}}>Champion</div>
+          <div style={{fontSize:22,fontWeight:900,fontFamily:"'Bebas Neue',sans-serif",color:C.yellow,letterSpacing:1}}>Stairway to Heaven</div>
+          <div style={{fontSize:12,color:C.yellowLt}}>Led Zeppelin · 1971</div>
+        </div>
+      </div>
+
+      {/* Headline stats */}
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:16}}>
+        <div style={{background:C.white,borderRadius:12,padding:"16px",border:`1px solid ${C.gray100}`,textAlign:"center"}}>
+          <div style={{fontSize:32,fontWeight:900,fontFamily:"'Bebas Neue',sans-serif",color:C.black}}>
+            {uniqueVoters!=null?uniqueVoters:"—"}
+          </div>
+          <div style={{fontSize:11,color:C.gray500,fontFamily:"'Barlow Condensed',sans-serif",textTransform:"uppercase",letterSpacing:1}}>Unique Voters</div>
+        </div>
+        <div style={{background:C.white,borderRadius:12,padding:"16px",border:`1px solid ${C.gray100}`,textAlign:"center"}}>
+          <div style={{fontSize:32,fontWeight:900,fontFamily:"'Bebas Neue',sans-serif",color:C.black}}>{locked.length}</div>
+          <div style={{fontSize:11,color:C.gray500,fontFamily:"'Barlow Condensed',sans-serif",textTransform:"uppercase",letterSpacing:1}}>Matchups Played</div>
+        </div>
+      </div>
+
+      {accuracy!=null&&(
+        <StatCard title="Your Accuracy">
+          <div style={{display:"flex",alignItems:"baseline",gap:8}}>
+            <div style={{fontSize:40,fontWeight:900,fontFamily:"'Bebas Neue',sans-serif",color:C.black,lineHeight:1}}>{accuracy}%</div>
+            <div style={{fontSize:13,color:C.gray500}}>correct across {withVote.length} votes</div>
+          </div>
+        </StatCard>
+      )}
+
+      <StatCard title="🏆 Closest Matchups">
+        {closest.map((m,i)=><MatchupRow key={m.id} m={m}/>)}
+      </StatCard>
+
+      <StatCard title="🐴 Cinderella Stories">
+        {cinderella.map((m,i)=>(
+          <div key={m.id} style={{marginBottom:10,paddingBottom:10,borderBottom:`1px solid ${C.gray100}`}}>
+            <div style={{fontSize:13,fontWeight:700,color:C.black}}>#{m.winner.seed} {m.winner.title} <span style={{fontWeight:400,color:C.gray500}}>upset</span> #{m.loser.seed} {m.loser.title}</div>
+            <div style={{fontSize:11,color:C.gray400,marginTop:2}}>{Math.round((m.winner===m.song1?m.votes.a:m.votes.b)/(m.votes.a+m.votes.b)*100)}% of the vote</div>
+          </div>
+        ))}
+      </StatCard>
+
+      <StatCard title="💪 Biggest Blowouts">
+        {blowouts.map((m,i)=><MatchupRow key={m.id} m={m}/>)}
+      </StatCard>
+    </div>
+  );
 }
 
 // ── Vote card ─────────────────────────────────────────────────────────────────
@@ -1953,6 +2116,9 @@ export default function App(){
         )}
       </div>
       <div style={{maxWidth:560,margin:"0 auto",padding:`${(LIVE_PLAYLISTS?.spotify||LIVE_PLAYLISTS?.apple?104:72)+(WEEKEND_MODE?36:0)}px 16px 48px`}}>
+        {CURRENT_DAY>9?(
+          <TournamentStats matchups={matchups} voted={voted}/>
+        ):(
         <div style={{marginBottom:28}}>
           <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
             {CURRENT_DAY>0&&<span className="live-dot" style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.yellow,flexShrink:0}}/>}
@@ -1975,18 +2141,21 @@ export default function App(){
             </div>
           )}
         </div>
-        {pastMs.length>0&&(
+        )}
+        {CURRENT_DAY<=9&&pastMs.length>0&&(
           <div>
             <div style={{fontSize:11,textTransform:"uppercase",letterSpacing:2,color:C.gray500,fontFamily:"'Barlow Condensed',sans-serif",marginBottom:12,paddingTop:16,borderTop:`1px solid ${C.gray200}`}}>Previous Results</div>
             {pastMs.map(m=><VoteCard key={m.id} m={m} voted={voted} pending={pending} setPending={setPending} confirmVote={confirmVote} highlight={m.id===highlightId}/>)}
           </div>
         )}
+        {CURRENT_DAY<=9&&(
         <div style={{textAlign:"center",paddingTop:24,paddingBottom:8}}>
           <button onClick={()=>setPeekResults(p=>!p)}
             style={{background:"none",border:"none",cursor:"pointer",color:C.gray300,fontSize:11,fontFamily:"'Barlow Condensed',sans-serif",letterSpacing:1}}>
             {peekResults?"hide results":"..."}
           </button>
         </div>
+        )}
       </div>
     </div>
   );
